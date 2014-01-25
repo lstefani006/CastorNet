@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="450c3d7e2cd54ad682ad7710f269c807" Name="Diagram1" ZoomLevel="75">
+        <EntityTypeShape EntityType="enrModel.Branch" Width="1.5" PointX="0.625" PointY="1" IsExpanded="true" />
+        <EntityTypeShape EntityType="enrModel.BranchElement" Width="1.5" PointX="3" PointY="0.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="enrModel.BranchGroup" Width="1.5" PointX="3.875" PointY="4.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="enrModel.BranchGroupElement" Width="1.5" PointX="0.5" PointY="4" IsExpanded="true" />
+        <EntityTypeShape EntityType="enrModel.Node" Width="1.5" PointX="5.375" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="enrModel.Ride" Width="1.5" PointX="8.375" PointY="3.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="enrModel.RideStop" Width="1.5" PointX="7.875" PointY="0.5" IsExpanded="true" />
+        <AssociationConnector Association="enrModel.FK_BranchElement_1_0" ManuallyRouted="false" />
+        <AssociationConnector Association="enrModel.FK_BranchGroupElement_0_0" ManuallyRouted="false" />
+        <AssociationConnector Association="enrModel.FK_BranchElement_0_0" ManuallyRouted="false" />
+        <AssociationConnector Association="enrModel.FK_BranchGroupElement_1_0" ManuallyRouted="false" />
+        <AssociationConnector Association="enrModel.FK_RideStop_1_0" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

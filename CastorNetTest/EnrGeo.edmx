@@ -1,0 +1,483 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="enrModel.Store" Provider="System.Data.SQLite" ProviderManifestToken="ISO8601" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Branch">
+          <Key>
+            <PropertyRef Name="BranchId" />
+          </Key>
+          <Property Name="BranchId" Type="int" Nullable="false" />
+          <Property Name="BranchName" Type="char" MaxLength="2147483647" />
+          <Property Name="DistanceKm" Type="int" />
+        </EntityType>
+        <EntityType Name="BranchElement">
+          <Key>
+            <PropertyRef Name="BranchId" />
+            <PropertyRef Name="OrderNum" />
+          </Key>
+          <Property Name="BranchId" Type="int" Nullable="false" />
+          <Property Name="OrderNum" Type="int" Nullable="false" />
+          <Property Name="NodeId" Type="int" />
+          <Property Name="DistanceKm" Type="int" />
+        </EntityType>
+        <EntityType Name="BranchGroup">
+          <Key>
+            <PropertyRef Name="BranchGroupId" />
+          </Key>
+          <Property Name="BranchGroupId" Type="int" Nullable="false" />
+          <Property Name="BranchGroupName" Type="char" MaxLength="2147483647" />
+          <Property Name="ParentBranchGroupId" Type="int" />
+        </EntityType>
+        <EntityType Name="BranchGroupElement">
+          <Key>
+            <PropertyRef Name="BranchGroupId" />
+            <PropertyRef Name="OrderNum" />
+          </Key>
+          <Property Name="BranchGroupId" Type="int" Nullable="false" />
+          <Property Name="OrderNum" Type="int" Nullable="false" />
+          <Property Name="BranchId" Type="int" />
+        </EntityType>
+        <EntityType Name="Node">
+          <Key>
+            <PropertyRef Name="NodeId" />
+          </Key>
+          <Property Name="NodeId" Type="int" Nullable="false" />
+          <Property Name="NodeCode" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="NodeShortNameEn" Type="nvarchar" MaxLength="256" Nullable="false" />
+          <Property Name="NodeShortNameAr" Type="nvarchar" MaxLength="256" Nullable="false" />
+          <Property Name="NodeLongNameEn" Type="nvarchar" MaxLength="256" Nullable="false" />
+          <Property Name="NodeLongNameAr" Type="nvarchar" MaxLength="256" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Ride">
+          <Key>
+            <PropertyRef Name="OperatorId" />
+            <PropertyRef Name="RideId" />
+          </Key>
+          <Property Name="OperatorId" Type="int" Nullable="false" />
+          <Property Name="RideId" Type="int" Nullable="false" />
+          <Property Name="RideCode" Type="char" MaxLength="2147483647" />
+          <Property Name="RideNumber" Type="int" />
+          <Property Name="RideTypeId" Type="int" />
+          <Property Name="RideName" Type="char" MaxLength="2147483647" />
+          <Property Name="RideCategory" Type="int" />
+          <Property Name="PeriodId" Type="int" />
+          <Property Name="BranchGroupId" Type="int" />
+          <Property Name="RideStartDate" Type="datetime" />
+          <Property Name="RideEndDate" Type="datetime" />
+          <Property Name="DepNodeId" Type="int" />
+          <Property Name="DepartureTime" Type="datetime" />
+          <Property Name="ArrNodeId" Type="int" />
+          <Property Name="ArrivalTime" Type="datetime" />
+          <Property Name="IsSpecial" Type="bit" />
+        </EntityType>
+        <EntityType Name="RideStop">
+          <Key>
+            <PropertyRef Name="OperatorId" />
+            <PropertyRef Name="RideId" />
+            <PropertyRef Name="OrderNum" />
+          </Key>
+          <Property Name="OperatorId" Type="int" Nullable="false" />
+          <Property Name="RideId" Type="int" Nullable="false" />
+          <Property Name="OrderNum" Type="int" Nullable="false" />
+          <Property Name="NodeId" Type="int" />
+          <Property Name="ArrivalDay" Type="int" />
+          <Property Name="ArrivalTime" Type="datetime" />
+          <Property Name="DepartureTime" Type="datetime" />
+        </EntityType>
+        <Association Name="FK_BranchElement_0_0">
+          <End Role="Node" Type="Self.Node" Multiplicity="0..1" />
+          <End Role="BranchElement" Type="Self.BranchElement" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Node">
+              <PropertyRef Name="NodeId" />
+            </Principal>
+            <Dependent Role="BranchElement">
+              <PropertyRef Name="NodeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BranchElement_1_0">
+          <End Role="Branch" Type="Self.Branch" Multiplicity="1" />
+          <End Role="BranchElement" Type="Self.BranchElement" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Branch">
+              <PropertyRef Name="BranchId" />
+            </Principal>
+            <Dependent Role="BranchElement">
+              <PropertyRef Name="BranchId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BranchGroupElement_0_0">
+          <End Role="Branch" Type="Self.Branch" Multiplicity="0..1" />
+          <End Role="BranchGroupElement" Type="Self.BranchGroupElement" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Branch">
+              <PropertyRef Name="BranchId" />
+            </Principal>
+            <Dependent Role="BranchGroupElement">
+              <PropertyRef Name="BranchId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BranchGroupElement_1_0">
+          <End Role="BranchGroup" Type="Self.BranchGroup" Multiplicity="1" />
+          <End Role="BranchGroupElement" Type="Self.BranchGroupElement" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="BranchGroup">
+              <PropertyRef Name="BranchGroupId" />
+            </Principal>
+            <Dependent Role="BranchGroupElement">
+              <PropertyRef Name="BranchGroupId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <!--Errors Found During Generation:
+warning 6035: The relationship 'FK_RideStop_0_0' has columns that are not part of the key of the table on the primary side of the relationship. The relationship was excluded.
+        <Association Name="FK_RideStop_0_0" />-->
+        <!--Errors Found During Generation:
+warning 6035: The relationship 'FK_RideStop_0_1' has columns that are not part of the key of the table on the primary side of the relationship. The relationship was excluded.
+        <Association Name="FK_RideStop_0_1" />-->
+        <Association Name="FK_RideStop_1_0">
+          <End Role="Node" Type="Self.Node" Multiplicity="0..1" />
+          <End Role="RideStop" Type="Self.RideStop" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Node">
+              <PropertyRef Name="NodeId" />
+            </Principal>
+            <Dependent Role="RideStop">
+              <PropertyRef Name="NodeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="enrModelStoreContainer">
+          <EntitySet Name="Branch" EntityType="Self.Branch" store:Type="Tables" />
+          <EntitySet Name="BranchElement" EntityType="Self.BranchElement" store:Type="Tables" />
+          <EntitySet Name="BranchGroup" EntityType="Self.BranchGroup" store:Type="Tables" />
+          <EntitySet Name="BranchGroupElement" EntityType="Self.BranchGroupElement" store:Type="Tables" />
+          <EntitySet Name="Node" EntityType="Self.Node" store:Type="Tables" />
+          <EntitySet Name="Ride" EntityType="Self.Ride" store:Type="Tables" />
+          <EntitySet Name="RideStop" EntityType="Self.RideStop" store:Type="Tables" />
+          <AssociationSet Name="FK_BranchElement_0_0" Association="Self.FK_BranchElement_0_0">
+            <End Role="Node" EntitySet="Node" />
+            <End Role="BranchElement" EntitySet="BranchElement" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BranchElement_1_0" Association="Self.FK_BranchElement_1_0">
+            <End Role="Branch" EntitySet="Branch" />
+            <End Role="BranchElement" EntitySet="BranchElement" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BranchGroupElement_0_0" Association="Self.FK_BranchGroupElement_0_0">
+            <End Role="Branch" EntitySet="Branch" />
+            <End Role="BranchGroupElement" EntitySet="BranchGroupElement" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BranchGroupElement_1_0" Association="Self.FK_BranchGroupElement_1_0">
+            <End Role="BranchGroup" EntitySet="BranchGroup" />
+            <End Role="BranchGroupElement" EntitySet="BranchGroupElement" />
+          </AssociationSet>
+          <AssociationSet Name="FK_RideStop_1_0" Association="Self.FK_RideStop_1_0">
+            <End Role="Node" EntitySet="Node" />
+            <End Role="RideStop" EntitySet="RideStop" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="enrModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Branch">
+          <Key>
+            <PropertyRef Name="BranchId" />
+          </Key>
+          <Property Name="BranchId" Type="Int32" Nullable="false" />
+          <Property Name="BranchName" Type="String" MaxLength="2147483647" FixedLength="true" Unicode="false" />
+          <Property Name="DistanceKm" Type="Int32" />
+          <NavigationProperty Name="BranchElement" Relationship="Self.FK_BranchElement_1_0" FromRole="Branch" ToRole="BranchElement" />
+          <NavigationProperty Name="BranchGroupElement" Relationship="Self.FK_BranchGroupElement_0_0" FromRole="Branch" ToRole="BranchGroupElement" />
+        </EntityType>
+        <EntityType Name="BranchElement">
+          <Key>
+            <PropertyRef Name="BranchId" />
+            <PropertyRef Name="OrderNum" />
+          </Key>
+          <Property Name="BranchId" Type="Int32" Nullable="false" />
+          <Property Name="OrderNum" Type="Int32" Nullable="false" />
+          <Property Name="NodeId" Type="Int32" />
+          <Property Name="DistanceKm" Type="Int32" />
+          <NavigationProperty Name="Branch" Relationship="Self.FK_BranchElement_1_0" FromRole="BranchElement" ToRole="Branch" />
+          <NavigationProperty Name="Node" Relationship="Self.FK_BranchElement_0_0" FromRole="BranchElement" ToRole="Node" />
+        </EntityType>
+        <EntityType Name="BranchGroup">
+          <Key>
+            <PropertyRef Name="BranchGroupId" />
+          </Key>
+          <Property Name="BranchGroupId" Type="Int32" Nullable="false" />
+          <Property Name="BranchGroupName" Type="String" MaxLength="2147483647" FixedLength="true" Unicode="false" />
+          <Property Name="ParentBranchGroupId" Type="Int32" />
+          <NavigationProperty Name="BranchGroupElement" Relationship="Self.FK_BranchGroupElement_1_0" FromRole="BranchGroup" ToRole="BranchGroupElement" />
+        </EntityType>
+        <EntityType Name="BranchGroupElement">
+          <Key>
+            <PropertyRef Name="BranchGroupId" />
+            <PropertyRef Name="OrderNum" />
+          </Key>
+          <Property Name="BranchGroupId" Type="Int32" Nullable="false" />
+          <Property Name="OrderNum" Type="Int32" Nullable="false" />
+          <Property Name="BranchId" Type="Int32" />
+          <NavigationProperty Name="Branch" Relationship="Self.FK_BranchGroupElement_0_0" FromRole="BranchGroupElement" ToRole="Branch" />
+          <NavigationProperty Name="BranchGroup" Relationship="Self.FK_BranchGroupElement_1_0" FromRole="BranchGroupElement" ToRole="BranchGroup" />
+        </EntityType>
+        <EntityType Name="Node">
+          <Key>
+            <PropertyRef Name="NodeId" />
+          </Key>
+          <Property Name="NodeId" Type="Int32" Nullable="false" />
+          <Property Name="NodeCode" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="NodeShortNameEn" Type="String" MaxLength="256" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="NodeShortNameAr" Type="String" MaxLength="256" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="NodeLongNameEn" Type="String" MaxLength="256" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="NodeLongNameAr" Type="String" MaxLength="256" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="BranchElement" Relationship="Self.FK_BranchElement_0_0" FromRole="Node" ToRole="BranchElement" />
+          <NavigationProperty Name="RideStop" Relationship="enrModel.FK_RideStop_1_0" FromRole="Node" ToRole="RideStop" />
+        </EntityType>
+        <EntityType Name="Ride">
+          <Key>
+            <PropertyRef Name="OperatorId" />
+            <PropertyRef Name="RideId" />
+          </Key>
+          <Property Name="OperatorId" Type="Int32" Nullable="false" />
+          <Property Name="RideId" Type="Int32" Nullable="false" />
+          <Property Name="RideCode" Type="String" MaxLength="2147483647" FixedLength="true" Unicode="false" />
+          <Property Name="RideNumber" Type="Int32" />
+          <Property Name="RideTypeId" Type="Int32" />
+          <Property Name="RideName" Type="String" MaxLength="2147483647" FixedLength="true" Unicode="false" />
+          <Property Name="RideCategory" Type="Int32" />
+          <Property Name="PeriodId" Type="Int32" />
+          <Property Name="BranchGroupId" Type="Int32" />
+          <Property Name="RideStartDate" Type="DateTime" />
+          <Property Name="RideEndDate" Type="DateTime" />
+          <Property Name="DepNodeId" Type="Int32" />
+          <Property Name="DepartureTime" Type="DateTime" />
+          <Property Name="ArrNodeId" Type="Int32" />
+          <Property Name="ArrivalTime" Type="DateTime" />
+          <Property Name="IsSpecial" Type="Boolean" />
+        </EntityType>
+        <EntityType Name="RideStop">
+          <Key>
+            <PropertyRef Name="OperatorId" />
+            <PropertyRef Name="RideId" />
+            <PropertyRef Name="OrderNum" />
+          </Key>
+          <Property Name="OperatorId" Type="Int32" Nullable="false" />
+          <Property Name="RideId" Type="Int32" Nullable="false" />
+          <Property Name="OrderNum" Type="Int32" Nullable="false" />
+          <Property Name="NodeId" Type="Int32" />
+          <Property Name="ArrivalDay" Type="Int32" />
+          <Property Name="ArrivalTime" Type="DateTime" />
+          <Property Name="DepartureTime" Type="DateTime" />
+          <NavigationProperty Name="Node" Relationship="enrModel.FK_RideStop_1_0" FromRole="RideStop" ToRole="Node" />
+        </EntityType>
+        <Association Name="FK_BranchElement_1_0">
+          <End Role="Branch" Type="Self.Branch" Multiplicity="1" />
+          <End Role="BranchElement" Type="Self.BranchElement" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Branch">
+              <PropertyRef Name="BranchId" />
+            </Principal>
+            <Dependent Role="BranchElement">
+              <PropertyRef Name="BranchId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BranchGroupElement_0_0">
+          <End Role="Branch" Type="Self.Branch" Multiplicity="0..1" />
+          <End Role="BranchGroupElement" Type="Self.BranchGroupElement" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Branch">
+              <PropertyRef Name="BranchId" />
+            </Principal>
+            <Dependent Role="BranchGroupElement">
+              <PropertyRef Name="BranchId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BranchElement_0_0">
+          <End Role="Node" Type="Self.Node" Multiplicity="0..1" />
+          <End Role="BranchElement" Type="Self.BranchElement" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Node">
+              <PropertyRef Name="NodeId" />
+            </Principal>
+            <Dependent Role="BranchElement">
+              <PropertyRef Name="NodeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BranchGroupElement_1_0">
+          <End Role="BranchGroup" Type="Self.BranchGroup" Multiplicity="1" />
+          <End Role="BranchGroupElement" Type="Self.BranchGroupElement" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="BranchGroup">
+              <PropertyRef Name="BranchGroupId" />
+            </Principal>
+            <Dependent Role="BranchGroupElement">
+              <PropertyRef Name="BranchGroupId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="enrEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Branch" EntityType="Self.Branch" />
+          <EntitySet Name="BranchElement" EntityType="Self.BranchElement" />
+          <EntitySet Name="BranchGroup" EntityType="Self.BranchGroup" />
+          <EntitySet Name="BranchGroupElement" EntityType="Self.BranchGroupElement" />
+          <EntitySet Name="Node" EntityType="Self.Node" />
+          <EntitySet Name="Ride" EntityType="Self.Ride" />
+          <EntitySet Name="RideStop" EntityType="Self.RideStop" />
+          <AssociationSet Name="FK_BranchElement_1_0" Association="Self.FK_BranchElement_1_0">
+            <End Role="Branch" EntitySet="Branch" />
+            <End Role="BranchElement" EntitySet="BranchElement" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BranchGroupElement_0_0" Association="Self.FK_BranchGroupElement_0_0">
+            <End Role="Branch" EntitySet="Branch" />
+            <End Role="BranchGroupElement" EntitySet="BranchGroupElement" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BranchElement_0_0" Association="Self.FK_BranchElement_0_0">
+            <End Role="Node" EntitySet="Node" />
+            <End Role="BranchElement" EntitySet="BranchElement" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BranchGroupElement_1_0" Association="Self.FK_BranchGroupElement_1_0">
+            <End Role="BranchGroup" EntitySet="BranchGroup" />
+            <End Role="BranchGroupElement" EntitySet="BranchGroupElement" />
+          </AssociationSet>
+          <AssociationSet Name="FK_RideStop_1_0" Association="enrModel.FK_RideStop_1_0">
+            <End Role="Node" EntitySet="Node" />
+            <End Role="RideStop" EntitySet="RideStop" />
+          </AssociationSet>
+        </EntityContainer>
+        <Association Name="FK_RideStop_1_0">
+          <End Type="enrModel.Node" Role="Node" Multiplicity="0..1" />
+          <End Type="enrModel.RideStop" Role="RideStop" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Node">
+              <PropertyRef Name="NodeId" />
+            </Principal>
+            <Dependent Role="RideStop">
+              <PropertyRef Name="NodeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="enrModelStoreContainer" CdmEntityContainer="enrEntities">
+          <EntitySetMapping Name="Branch">
+            <EntityTypeMapping TypeName="enrModel.Branch">
+              <MappingFragment StoreEntitySet="Branch">
+                <ScalarProperty Name="BranchId" ColumnName="BranchId" />
+                <ScalarProperty Name="BranchName" ColumnName="BranchName" />
+                <ScalarProperty Name="DistanceKm" ColumnName="DistanceKm" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="BranchElement">
+            <EntityTypeMapping TypeName="enrModel.BranchElement">
+              <MappingFragment StoreEntitySet="BranchElement">
+                <ScalarProperty Name="BranchId" ColumnName="BranchId" />
+                <ScalarProperty Name="OrderNum" ColumnName="OrderNum" />
+                <ScalarProperty Name="NodeId" ColumnName="NodeId" />
+                <ScalarProperty Name="DistanceKm" ColumnName="DistanceKm" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="BranchGroup">
+            <EntityTypeMapping TypeName="enrModel.BranchGroup">
+              <MappingFragment StoreEntitySet="BranchGroup">
+                <ScalarProperty Name="BranchGroupId" ColumnName="BranchGroupId" />
+                <ScalarProperty Name="BranchGroupName" ColumnName="BranchGroupName" />
+                <ScalarProperty Name="ParentBranchGroupId" ColumnName="ParentBranchGroupId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="BranchGroupElement">
+            <EntityTypeMapping TypeName="enrModel.BranchGroupElement">
+              <MappingFragment StoreEntitySet="BranchGroupElement">
+                <ScalarProperty Name="BranchGroupId" ColumnName="BranchGroupId" />
+                <ScalarProperty Name="OrderNum" ColumnName="OrderNum" />
+                <ScalarProperty Name="BranchId" ColumnName="BranchId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Node">
+            <EntityTypeMapping TypeName="enrModel.Node">
+              <MappingFragment StoreEntitySet="Node">
+                <ScalarProperty Name="NodeId" ColumnName="NodeId" />
+                <ScalarProperty Name="NodeCode" ColumnName="NodeCode" />
+                <ScalarProperty Name="NodeShortNameEn" ColumnName="NodeShortNameEn" />
+                <ScalarProperty Name="NodeShortNameAr" ColumnName="NodeShortNameAr" />
+                <ScalarProperty Name="NodeLongNameEn" ColumnName="NodeLongNameEn" />
+                <ScalarProperty Name="NodeLongNameAr" ColumnName="NodeLongNameAr" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Ride">
+            <EntityTypeMapping TypeName="enrModel.Ride">
+              <MappingFragment StoreEntitySet="Ride">
+                <ScalarProperty Name="OperatorId" ColumnName="OperatorId" />
+                <ScalarProperty Name="RideId" ColumnName="RideId" />
+                <ScalarProperty Name="RideCode" ColumnName="RideCode" />
+                <ScalarProperty Name="RideNumber" ColumnName="RideNumber" />
+                <ScalarProperty Name="RideTypeId" ColumnName="RideTypeId" />
+                <ScalarProperty Name="RideName" ColumnName="RideName" />
+                <ScalarProperty Name="RideCategory" ColumnName="RideCategory" />
+                <ScalarProperty Name="PeriodId" ColumnName="PeriodId" />
+                <ScalarProperty Name="BranchGroupId" ColumnName="BranchGroupId" />
+                <ScalarProperty Name="RideStartDate" ColumnName="RideStartDate" />
+                <ScalarProperty Name="RideEndDate" ColumnName="RideEndDate" />
+                <ScalarProperty Name="DepNodeId" ColumnName="DepNodeId" />
+                <ScalarProperty Name="DepartureTime" ColumnName="DepartureTime" />
+                <ScalarProperty Name="ArrNodeId" ColumnName="ArrNodeId" />
+                <ScalarProperty Name="ArrivalTime" ColumnName="ArrivalTime" />
+                <ScalarProperty Name="IsSpecial" ColumnName="IsSpecial" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="RideStop">
+            <EntityTypeMapping TypeName="enrModel.RideStop">
+              <MappingFragment StoreEntitySet="RideStop">
+                <ScalarProperty Name="OperatorId" ColumnName="OperatorId" />
+                <ScalarProperty Name="RideId" ColumnName="RideId" />
+                <ScalarProperty Name="OrderNum" ColumnName="OrderNum" />
+                <ScalarProperty Name="NodeId" ColumnName="NodeId" />
+                <ScalarProperty Name="ArrivalDay" ColumnName="ArrivalDay" />
+                <ScalarProperty Name="ArrivalTime" ColumnName="ArrivalTime" />
+                <ScalarProperty Name="DepartureTime" ColumnName="DepartureTime" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="true" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
