@@ -1,0 +1,19 @@
+
+# lista dei file da committare 
+git status .
+
+# per committare un file
+git commit pippo.txt
+
+# per aggiungere un nuovo file al git
+git add pippo.txt
+
+# per vedere gli alias remoti
+git remove -v
+
+# per mandare i file modificati al server GitHUB
+git push origin master
+
+
+# per ottenere i file modificati dal sever GitHUB
+git pull
