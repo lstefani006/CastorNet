@@ -252,6 +252,7 @@ namespace CastorNet
 	}
 
 	///////////////////////////////////////////////////////////////
+
 	namespace Details
 	{
 		internal enum OpType { Gt, Ge, Lt, Le, eq, Ne };
