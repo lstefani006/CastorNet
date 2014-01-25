@@ -119,6 +119,7 @@ namespace CastorNet
 		public IEnumerable<bool> Exec() { return Exec(false); }
 		protected internal abstract IEnumerable<bool> Exec(bool fromOr);
 	}
+
 	public class Ref<T> where T : IComparable<T>
 	{
 		#region Compare
