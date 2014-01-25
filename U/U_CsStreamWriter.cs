@@ -19,8 +19,8 @@ public partial class U
 
 			_stmt = new List<Regex>
 				{
-					new Regex(@"^else$"),
 					new Regex(@"^if \(.*\)$"),
+					new Regex(@"^else$"),
 					new Regex(@"^else if \(.*\)$"),
 					new Regex(@"^for \(.*\)$"),
 					new Regex(@"^foreach \(.*\)$"),

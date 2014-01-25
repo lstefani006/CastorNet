@@ -48,7 +48,6 @@ namespace SqlLiteGen
 
 					var cols = new List<Col>();
 
-
 					foreach (DataRow col in cn.GetSchema("columns").Rows)
 					{
 						string coltb = col["TABLE_NAME"].ToString();
@@ -60,9 +59,6 @@ namespace SqlLiteGen
 						c.dataType = col["DATA_TYPE"].ToString();
 						c.primary = (bool)col["PRIMARY_KEY"];
 						c.isNullable = (bool)col["IS_NULLABLE"];
-
-						if (c.colName == "A")
-							Debugger.Break();
 
 						cols.Add(c);
 					}
@@ -179,7 +175,6 @@ namespace SqlLiteGen
 							colNum += 1;
 						}
 					}
-
 
 					cs.WriteLine("}");
 				}
