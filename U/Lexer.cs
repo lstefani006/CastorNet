@@ -6,73 +6,6 @@ using System.Text;
 
 namespace ULib.LLParserLexerLib
 {
-	public static class LexerTest
-	{
-		public static void Test()
-		{
-			int state = 0;
-
-			var acts = new RegAcceptList();
-			acts.Add("leo", 1);
-			acts.Add("leon", 2);
-			acts.Add(new RegOneOrMore(new RegTokenRange('a', 'z')), 3);
-			acts.Add("//", (ref NFA.Token tk, LexReader rd, NFA nfa) =>
-			{
-				for (; ; )
-				{
-					if (rd.Peek().ch == '\n') break;
-					if (rd.Peek().ch == -1) break;
-					rd.Read();
-				}
-				rd.SetMatch();
-				rd.EndToken(out tk.value, out tk.fileName, out tk.line);
-				return false;
-			});
-			acts.Add("/*", (ref NFA.Token tk, LexReader rd, NFA nfa) =>
-			{
-				for (; ; )
-				{
-					if (rd.Peek().ch == -1) throw new Exception("EOF in comment");
-					if (rd.Read().ch == '*' && rd.Peek().ch == '/')
-					{
-						rd.Read();
-						break;
-					}
-				}
-				rd.SetMatch();
-				rd.EndToken(out tk.value, out tk.fileName, out tk.line);
-				return false;
-			});
-			acts.Add(' ');
-			acts.Add('\n');
-
-			NFA net = new NFA(state, acts);
-
-			using (var rd = new LexReader("leo.txt"))
-			{
-				try
-				{
-					for (; ; )
-					{
-						NFA.Token ret = net.ReadToken(rd);
-
-						if (ret.value != "\n")
-							Console.WriteLine("token={0} value=\"{1}\" line={2}", ret.token, ret.value, ret.line);
-						else
-							Console.WriteLine("token={0} value=\"\\n\" line={1}", ret.token, ret.line);
-
-						if (ret.token == -1)
-							break;
-					}
-				}
-				catch (Exception ex)
-				{
-					Console.Write(ex.Message);
-				}
-			}
-		}
-	}
-
 	public class RegAcceptList : IEnumerable<RegAccept>
 	{
 		private List<RegAccept> _a = new List<RegAccept>();
@@ -893,4 +826,70 @@ namespace ULib.LLParserLexerLib
 		}
 	}
 
+	public static class LexerTest
+	{
+		public static void Test()
+		{
+			int state = 0;
+
+			var acts = new RegAcceptList();
+			acts.Add("leo", 1);
+			acts.Add("leon", 2);
+			acts.Add(new RegOneOrMore(new RegTokenRange('a', 'z')), 3);
+			acts.Add("//", (ref NFA.Token tk, LexReader rd, NFA nfa) =>
+			{
+				for (; ; )
+				{
+					if (rd.Peek().ch == '\n') break;
+					if (rd.Peek().ch == -1) break;
+					rd.Read();
+				}
+				rd.SetMatch();
+				rd.EndToken(out tk.value, out tk.fileName, out tk.line);
+				return false;
+			});
+			acts.Add("/*", (ref NFA.Token tk, LexReader rd, NFA nfa) =>
+			{
+				for (; ; )
+				{
+					if (rd.Peek().ch == -1) throw new Exception("EOF in comment");
+					if (rd.Read().ch == '*' && rd.Peek().ch == '/')
+					{
+						rd.Read();
+						break;
+					}
+				}
+				rd.SetMatch();
+				rd.EndToken(out tk.value, out tk.fileName, out tk.line);
+				return false;
+			});
+			acts.Add(' ');
+			acts.Add('\n');
+
+			NFA net = new NFA(state, acts);
+
+			using (var rd = new LexReader("leo.txt"))
+			{
+				try
+				{
+					for (; ; )
+					{
+						NFA.Token ret = net.ReadToken(rd);
+
+						if (ret.value != "\n")
+							Console.WriteLine("token={0} value=\"{1}\" line={2}", ret.token, ret.value, ret.line);
+						else
+							Console.WriteLine("token={0} value=\"\\n\" line={1}", ret.token, ret.line);
+
+						if (ret.token == -1)
+							break;
+					}
+				}
+				catch (Exception ex)
+				{
+					Console.Write(ex.Message);
+				}
+			}
+		}
+	}
 }
