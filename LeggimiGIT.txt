@@ -11,6 +11,9 @@ git add pippo.txt
 # per vedere gli alias remoti
 git remove -v
 
+# per creare un alias remoto
+git remote add origin https://github.com/lstefani006/CastorNet.git
+
 # per mandare i file modificati al server GitHUB
 git push origin master
 
