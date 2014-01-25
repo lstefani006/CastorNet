@@ -16,4 +16,4 @@ git push origin master
 
 
 # per ottenere i file modificati dal sever GitHUB
-git pull
+git pull origin master
