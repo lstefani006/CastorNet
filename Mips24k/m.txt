@@ -1,0 +1,10 @@
+
+del MaxDel(a : int, b : int) : int;
+
+
+fun leo(a: int, m : MaxDel) : int
+{
+	leo(a+1, a);
+	if (m != 0)
+	return m(a + 1, a);
+}

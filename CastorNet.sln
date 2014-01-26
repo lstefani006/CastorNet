@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LLParserGen", "LLParserGen\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeGen", "CodeGen\CodeGen.csproj", "{5128BF43-EB77-4546-B9E0-5B17543B9995}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mips24k", "Mips24k\Mips24k.csproj", "{D041EC64-4E6E-4EE6-8176-4B8F598290D4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{5128BF43-EB77-4546-B9E0-5B17543B9995}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5128BF43-EB77-4546-B9E0-5B17543B9995}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5128BF43-EB77-4546-B9E0-5B17543B9995}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D041EC64-4E6E-4EE6-8176-4B8F598290D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D041EC64-4E6E-4EE6-8176-4B8F598290D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D041EC64-4E6E-4EE6-8176-4B8F598290D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D041EC64-4E6E-4EE6-8176-4B8F598290D4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
