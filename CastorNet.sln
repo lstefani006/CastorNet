@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "U", "U\U.csproj", "{5F9250F
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LLParserGen", "LLParserGen\LLParserGen.csproj", "{CFF46A00-738E-4CC1-B9CC-420A80730AD4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeGen", "CodeGen\CodeGen.csproj", "{5128BF43-EB77-4546-B9E0-5B17543B9995}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{CFF46A00-738E-4CC1-B9CC-420A80730AD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CFF46A00-738E-4CC1-B9CC-420A80730AD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CFF46A00-738E-4CC1-B9CC-420A80730AD4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5128BF43-EB77-4546-B9E0-5B17543B9995}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5128BF43-EB77-4546-B9E0-5B17543B9995}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5128BF43-EB77-4546-B9E0-5B17543B9995}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5128BF43-EB77-4546-B9E0-5B17543B9995}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

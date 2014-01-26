@@ -1,0 +1,321 @@
+using System.Collections.Specialized;
+using System.Data;
+using System.Data.SqlClient;
+using System.Xml;
+using System.Collections;
+
+%%%%%%%%%%%%%%%%%
+using System; 
+using System.Data; 
+using System.Data.SqlClient; 
+using System.Data.SqlTypes; 
+using System.Collections;
+using System.Reflection;
+
+namespace SPDriver 
+{
+	#region RecordReaderBase
+
+	public class RecordReaderBase : IDisposable
+	{
+		protected SqlCommand _cmd = null;
+		protected SqlDataReader _reader = null;
+
+		protected RecordReaderBase(SqlConnection cn)
+		{
+			_cmd = new SqlCommand();
+			_cmd.CommandType = CommandType.StoredProcedure;
+			_cmd.Connection = cn;
+		}
+
+		public void CloseReader()
+		{
+			if (_reader != null && !_reader.IsClosed)
+			{
+				_reader.Close();
+				_reader = null;
+			}
+		}
+
+		public void Close()
+		{
+			CloseReader();
+
+			if (_cmd != null)
+			{
+				_cmd.Dispose();
+				_cmd = null;
+			}
+		}
+
+		public void Dispose()
+		{
+			Close();
+		}
+
+		public SqlDataReader ExecuteReader()
+		{
+			SqlTransaction tr = null;
+			return ExecuteReader(tr);
+		}
+
+		public SqlDataReader ExecuteReader(SqlTransaction tr)
+		{
+			if (_cmd.Connection.State == ConnectionState.Closed)
+				_cmd.Connection.Open();
+
+			_cmd.Transaction = tr;
+			_reader = _cmd.ExecuteReader();
+			return _reader;
+		}
+
+		public ArrayList ExecuteReader(Type recordType)
+		{
+			SqlTransaction tr = null;
+			ArrayList r = ExecuteReader(tr, recordType);
+			return r;
+		}
+
+		public ArrayList[] ExecuteReader(params Type[] recordTypeList)
+		{
+			SqlTransaction tr = null;
+			ArrayList[] r = ExecuteReader(tr, recordTypeList);
+			return r;
+		}
+
+		public ArrayList[] ExecuteReader(SqlTransaction tr, params Type[] recordTypeList)
+		{
+			try
+			{
+				if (tr == null)
+					ExecuteReader();
+				else
+					ExecuteReader(tr);
+
+				ArrayList[] ret = new ArrayList[recordTypeList.Length];
+
+				object[] idr = new object[1];
+				idr[0] = (IDataReader) _reader;
+
+
+				for (int recordTypeIndex = 0; recordTypeIndex < recordTypeList.Length; ++recordTypeIndex)
+				{
+					Type recordType = recordTypeList[recordTypeIndex];
+
+					if (!recordType.IsClass)
+						throw new ArgumentNullException("recordType", "deve essere una classe!");
+
+					ConstructorInfo ci = recordType.GetConstructor(new Type[] {});
+					if (ci == null)
+						throw new ArgumentException("recordType",
+								string.Format("{0}.ExecuteReader: {1} deve avere un costruttore senza parametri", this.GetType().Name, recordType.Name));
+
+					MethodInfo mi = recordType.GetMethod("Read", new Type[] {typeof (IDataReader)});
+					if (mi == null)
+						throw new ArgumentException("recordType", 
+								string.Format("{0}.ExecuteReader: {1} deve implementare Read(IDataReader rd)", this.GetType().Name, recordType.Name));
+
+					ArrayList r = new ArrayList();
+
+					while (_reader.Read())
+					{
+						object record = ci.Invoke(null);
+						mi.Invoke(record, idr);
+						r.Add(record);
+					}
+					ret[recordTypeIndex] = r;
+
+					if (!_reader.NextResult())
+						break;
+				}
+
+				return ret;
+			}
+			finally
+			{
+				CloseReader();
+			}
+		}
+
+		public ArrayList ExecuteReader(SqlTransaction tr, Type recordType)
+		{
+			try
+			{
+				if (tr == null)
+					ExecuteReader();
+				else
+					ExecuteReader(tr);
+
+				object[] idr = new object[1];
+				idr[0] = (IDataReader) _reader;
+
+
+				if (!recordType.IsClass)
+					throw new ArgumentNullException("recordType", "deve essere una classe!");
+
+				ConstructorInfo ci = recordType.GetConstructor(new Type[] {});
+				if (ci == null)
+					throw new ArgumentException("recordType",
+						string.Format("{0}.ExecuteReader: {1} deve avere un costruttore senza parametri", this.GetType().Name, recordType.Name));
+
+				MethodInfo mi = recordType.GetMethod("Read", new Type[] {typeof (IDataReader)});
+				if (mi == null)
+					throw new ArgumentException("recordType", 
+						string.Format("{0}.ExecuteReader: {1} deve implementare Read(IDataReader rd)", this.GetType().Name, recordType.Name));
+
+				ArrayList r = new ArrayList();
+
+				while (_reader.Read())
+				{
+					object record = ci.Invoke(null);
+					mi.Invoke(record, idr);
+					r.Add(record);
+				}
+
+				return r;
+			}
+			finally
+			{
+				CloseReader();
+			}
+		}
+
+	}
+	#endregion
+
+~	
+~	foreach (string spName in StoredProcedureDaElaborare())
+~	{
+~		DbStoredProcedure sp = DB.StoredProcedures[spName];
+~		string className = sp.Name;
+~		bool needReader = sp.CommandResult.Count > 0; 
+~		if (!needReader) Error("La sp {0} non ha bisogno di un reader", sp.Name);
+~
+
+	public class <%= className %> : RecordReaderBase
+	{
+~		foreach (SqlParameter p in sp.Parameters) 
+~		{ 
+~		string varName = p.ParameterName.Substring(1); 
+~		string parName = "_prm" + p.ParameterName.Substring(1); 
+		private SqlParameter <%= parName %>;
+~		}
+
+		public <%= className %>(SqlConnection cn)
+			: base(cn)
+		{
+			_cmd.CommandText = "[dbo].[<%= sp.Name %>]";
+~
+~			foreach (SqlParameter p in sp.Parameters) 
+~			{ 
+
+~			string varName = p.ParameterName.Substring(1); 
+~			string parName = "_prm" + p.ParameterName.Substring(1); 
+			<%= parName %> = _cmd.Parameters.Add("<%= p.ParameterName %>", SqlDbType.<%= p.SqlDbType.ToString() %>);
+~			if (p.Size > 0)
+~			{
+			<%= parName %>.Size = <%= p.Size %>;
+~			}
+			<%= parName %>.IsNullable = true;
+~			if (p.Direction == ParameterDirection.ReturnValue)
+~			{
+			<%= parName %>.Direction = ParameterDirection.ReturnValue;
+~			}
+~			else if (p.Direction == ParameterDirection.Output)
+~			{
+			<%= parName %>.Direction = ParameterDirection.<%= p.Direction.ToString() %>;
+~			}
+~			else if (p.Direction == ParameterDirection.Input) 
+~			{
+			<%= parName %>.Direction = ParameterDirection.Input;
+~			}
+~			if (p.Direction == ParameterDirection.InputOutput) 
+~			{
+			<%= parName %>.Direction = ParameterDirection.InputOutput;
+~			}
+~			}
+		}
+
+~		foreach (SqlParameter p in sp.Parameters) 
+~		{ 
+~			string sqlType = DbServer.GetSqlType(p.SqlDbType); 
+~			string varName = p.ParameterName.Substring(1); 
+~			string parName = "_prm" + p.ParameterName.Substring(1); 
+~			string csType  = DbServer.GetCSharpVariableType(p.SqlDbType); 
+
+		public <%= sqlType %> <%= varName %>
+		{
+			get
+			{
+				if (<%= parName %>.Value != null)
+				{
+					if (<%= parName %>.Value == DBNull.Value) return <%= sqlType %>.Null;
+					if (<%= parName %>.Value is <%= sqlType %>) return (<%= sqlType %>) <%= parName %>.Value; 
+				}
+			   	return new <%= sqlType %>((<%= csType %>)<%= parName %>.Value); 
+			}
+~			if (p.Direction == ParameterDirection.InputOutput || p.Direction == ParameterDirection.Input)
+~			{
+			set
+			{
+				<%= parName %>.Value = value; 
+			}
+~			}
+		}
+~		} 
+		
+	}
+~	} 
+}
+
+%%%%%%%%%%%%%%%%%
+
+		
+		public string [] StoredProcedureDaElaborare()
+		{
+			ArrayList r = new ArrayList();
+			XmlNodeList n = Config.DocumentElement.SelectNodes("StoredProcedure");
+			foreach (XmlElement e in n)
+				r.Add(e.GetAttribute("Name"));
+				
+			return (string []) r.ToArray(typeof(string));
+		}
+
+		protected override void OnStart()
+		{
+			string cn = GetConfigOrDie("ConnectionString");
+			string db = GetConfigOrDie("DB");
+			
+			try
+			{
+				DbServer dbs = new DbServer(cn);
+				this.DB = dbs.GetDB(db);
+				if (this.DB == null) Error("Non riesco a a trovare il DB '{0}'", db);
+			}
+			catch (Exception ex)
+			{
+				Error(ex.Message);
+			}
+		}
+		
+		DbInst DB;
+		
+		
+		public override void Help()
+		{
+			Console.Error.WriteLine("SPReader.gen:");
+			Console.Error.WriteLine("Genera classi C# per lanciare stored procedure che hanno dei result set");
+			
+			Console.Error.WriteLine();
+			Console.Error.WriteLine(@"<CodeGen ");
+			Console.Error.WriteLine(@" ConnectionString=""user id=sa;password=bilaterali;data source='Bilsvr1'""");
+			Console.Error.WriteLine(@" DB=""Bipex""");
+			Console.Error.WriteLine(@" FileGen=""SPReader.gen""");
+			Console.Error.WriteLine(@" FileOut=""SPReader.cs"" >");
+			Console.Error.WriteLine(@" <StoredProcedure Name='Offerta_Modifica'/>");
+			Console.Error.WriteLine(@" <StoredProcedure Name='Offerta_Nascondi'/>");
+			Console.Error.WriteLine(@" <StoredProcedure Name='Offerta_Nuova'/>");
+			Console.Error.WriteLine(@"</CodeGen>");
+		}
+
+

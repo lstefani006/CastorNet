@@ -1,0 +1,355 @@
+using System.Collections.Specialized;
+using System.Data;
+using System.Data.SqlClient;
+using System.Xml;
+using System.Collections;
+
+%%%%%%%%%%%%%%%%%
+using System; 
+using System.Data; 
+using System.Data.SqlClient; 
+using System.Data.SqlTypes; 
+namespace SPDriver 
+{ 
+~	foreach (string spName in StoredProcedureDaElaborare())
+~	{
+~		DbStoredProcedure sp = DB.StoredProcedures[spName];
+~		string className = sp.Name;
+~		bool needReader = sp.CommandResult.Count > 0; 
+~		if (needReader) Error("La sp {0} ha bisogno di un reader", sp.Name);
+	public class <%= className %>
+	{
+		#region Member variables
+		protected int _returnValue = 0;
+~		foreach (SqlParameter p in sp.Parameters)
+~		{
+~			if (p.Direction == ParameterDirection.ReturnValue) continue; 
+~			string sqlType = DbServer.GetSqlType(p.SqlDbType); 
+~			string varName = p.ParameterName.Substring(1); 
+		protected <%= sqlType %> _<%= varName %> = <%= sqlType %>.Null;
+		protected bool _<%= varName %>Set = false;
+~		} 
+		#endregion
+		
+		#region Public Properties
+~		foreach (SqlParameter p in sp.Parameters) 
+~		{ 
+~			if (p.Direction == ParameterDirection.ReturnValue) continue; 
+~			string sqlType = DbServer.GetSqlType(p.SqlDbType); 
+~			string varName = p.ParameterName.Substring(1); 
+
+		public <%= sqlType %> <%= varName %>
+		{
+			get { return _<%= varName %>; }
+			set 
+			{
+				_<%= varName %> = value;
+				_<%= varName %>Set = true;
+			}
+		}
+~		} 
+		#endregion
+
+		public SqlCommand CreateCommand(SqlConnection cn, SqlTransaction tr)
+		{
+			SqlCommand cmd = cn.CreateCommand();
+			cmd.Transaction = tr;
+
+			cmd.CommandText = "[dbo].[<%= sp.Name %>]";
+			cmd.CommandType = CommandType.StoredProcedure;
+
+~			foreach (SqlParameter p in sp.Parameters) 
+~			{ 
+~			string varName = p.ParameterName.Substring(1); 
+~			string parName = "prm" + p.ParameterName.Substring(1); 
+			SqlParameter <%= parName %> = cmd.Parameters.Add("<%= p.ParameterName %>", SqlDbType.<%= p.SqlDbType.ToString() %>);
+			<%= parName %>.IsNullable = true;
+~			if (p.Size > 0)
+~			{
+			<%= parName %>.Size = <%= p.Size %>;
+~			}
+~			if (p.Direction == ParameterDirection.ReturnValue)
+~			{
+			<%= parName %>.Direction = ParameterDirection.ReturnValue;
+~			}
+~			if (p.Direction == ParameterDirection.Output)
+~			{
+			<%= parName %>.Direction = ParameterDirection.<%= p.Direction.ToString() %>;
+~			}
+~			if (p.Direction == ParameterDirection.Input) 
+~			{
+			<%= parName %>.Direction = ParameterDirection.Input;
+			if (this._<%= varName %>Set == true)
+				<%= parName %>.Value = this.<%= varName %>;
+~			}
+~			if (p.Direction == ParameterDirection.InputOutput) 
+~			{
+			if (this._<%= varName %>Set)
+				<%= parName %>.Direction = ParameterDirection.InputOutput;
+			else
+				<%= parName %>.Direction = ParameterDirection.Output;
+			if (this._<%= varName %>Set)
+				<%= parName %>.Value = this.<%= varName %>;
+~			}
+~			Out.WriteLine();
+~			}
+
+			return cmd;
+		}
+
+		public void ReadOutput(SqlCommand cmd)
+		{
+			SqlParameter prmRETURN_VALUE = cmd.Parameters["@RETURN_VALUE"];
+			if (prmRETURN_VALUE.Value != null && prmRETURN_VALUE.Value != DBNull.Value)
+				_returnValue = (int)prmRETURN_VALUE.Value;
+~			foreach (SqlParameter p in sp.Parameters) 
+~			{ 
+~				if (p.Direction == ParameterDirection.Output || p.Direction == ParameterDirection.InputOutput) 
+~				{ 
+~					string varName = p.ParameterName.Substring(1); 
+~					string parName = "prm" + p.ParameterName.Substring(1); 
+~					string sqlType = DbServer.GetSqlType(p.SqlDbType); 
+
+			SqlParameter <%= parName %> = cmd.Parameters["<%= p.ParameterName %>"];
+			if (<%= parName %> != null && <%= parName %>.Value != null)
+			{
+				if (<%= parName %>.Value is <%= sqlType %>)
+					this.<%= p.ParameterName.Substring(1) %> = (<%= sqlType %>)<%= parName %>.Value;
+				else
+				{
+					if (<%= parName %>.Value != DBNull.Value)
+~						string csType = DbServer.GetCSharpVariableType(p.SqlDbType); 
+						this.<%= p.ParameterName.Substring(1) %> = new <%= sqlType %>((<%= csType %>)<%= parName %>.Value);
+					else
+						this.<%= p.ParameterName.Substring(1) %> = <%= sqlType %>.Null;
+				}
+			}
+~				} 
+~			} 
+		}
+
+		
+		#region Execute Region
+		public <%= needReader ? "SqlDataReader" : "void" %> Execute<%= needReader ? "Reader" : "" %>(SqlConnection cn)
+		{
+			SqlTransaction tr = null;
+			<%= needReader ? "return " : "" %>Execute<%= needReader ? "Reader" : "" %>(cn, tr);
+		}
+
+		public <%= needReader ? "SqlDataReader" : "void" %> Execute<%= needReader ? "Reader" : "" %>(SqlConnection cn, SqlTransaction tr)
+		{
+~			if (needReader) 
+~			{
+			SqlDataReader reader = null;
+~			} 
+~			else
+~			{
+			bool cnOpenedLocally = false;
+~			}
+
+			SqlCommand cmd = null;
+
+			try
+			{
+				cmd = this.CreateCommand(cn, tr);
+
+				if (tr == null && cn.State == ConnectionState.Closed)
+				{
+					cn.Open();
+~				if (needReader == false) 
+~				{
+					cnOpenedLocally = true;
+~				} 
+				}
+					
+~				if (needReader) { 
+				reader = cmd.ExecuteReader();
+~				} else { 
+				cmd.ExecuteNonQuery();
+~				} 
+				
+~				if (needReader == false)
+~				{
+				ReadOutput(cmd);
+~				}
+			}
+			finally
+			{
+~				if (needReader == false)
+~				{
+				cmd.Connection = null;
+				cmd.Dispose();
+				if (cnOpenedLocally && cn.State == ConnectionState.Open)
+					cn.Close();
+~				}
+			}
+	
+~			if (needReader) { 
+			return reader;
+~			} 
+		}
+		
+
+		public static <%= needReader ? "SqlDataReader" : "void" %> Execute<%= needReader ? "Reader" : "" %>(
+				SqlConnection cn<%= sp.Parameters.Count > 1 ? "," : ", int dummy)" %>
+~		for (int i = 0; i < sp.Parameters.Count; ++i) 
+~		{ 
+~			SqlParameter p = sp.Parameters[i]; 
+~			if (p.Direction == ParameterDirection.ReturnValue) continue; 
+~			string sqlType = DbServer.GetSqlType(p.SqlDbType); 
+~			string varName = p.ParameterName.Substring(1); 
+~			string inRef = string.Empty; 
+~			if (p.Direction == ParameterDirection.Output) inRef = "out "; 
+~			if (p.Direction == ParameterDirection.InputOutput) inRef = "ref "; 
+				<%= inRef %><%= sqlType %> <%= varName %><%= i == sp.Parameters.Count - 1 ? ")" : "," %>
+~		}
+		{
+			<%= className %> runner = new <%= className %>();
+~			foreach (SqlParameter p in sp.Parameters) 
+~			{ 
+~				if (p.Direction == ParameterDirection.ReturnValue) continue; 
+~				string sqlType = DbServer.GetSqlType(p.SqlDbType); 
+~				string varName = p.ParameterName.Substring(1); 
+			runner.<%= varName %> = <%= varName %>;
+~			} 
+			
+~			if (needReader == false)
+~			{
+			runner.Execute(cn);
+~			}
+~			else
+~			{
+			SqlDataReader rd = runner.ExecuteReader(cn);
+~			}
+
+~			foreach (SqlParameter p in sp.Parameters)
+~			{
+~				if (p.Direction == ParameterDirection.ReturnValue) continue;
+~				if (p.Direction == ParameterDirection.Input) continue;
+~				string varName = p.ParameterName.Substring(1);
+			<%= varName %> = runner.<%= varName %>;
+~			}
+			
+~			if (needReader)
+~			{
+			return rd;
+~			}
+		}
+
+		public static void Execute(
+				SqlTransaction tr<%= sp.Parameters.Count > 1 ? "," : ", int dummy)" %>
+~		for (int i = 0; i < sp.Parameters.Count; ++i) 
+~		{ 
+~			SqlParameter p = sp.Parameters[i]; 
+~			if (p.Direction == ParameterDirection.ReturnValue) continue; 
+~			string sqlType = DbServer.GetSqlType(p.SqlDbType); 
+~			string varName = p.ParameterName.Substring(1); 
+~			string inRef = string.Empty; 
+~			if (p.Direction == ParameterDirection.Output) inRef = "out "; 
+~			if (p.Direction == ParameterDirection.InputOutput) inRef = "ref "; 
+				<%= inRef %><%= sqlType %> <%= varName %><%= i == sp.Parameters.Count - 1 ? ")" : "," %>
+~		}
+		{
+			<%= className %> runner = new <%= className %>();
+~			foreach (SqlParameter p in sp.Parameters) 
+~			{ 
+~				if (p.Direction == ParameterDirection.ReturnValue) continue; 
+~				string sqlType = DbServer.GetSqlType(p.SqlDbType); 
+~				string varName = p.ParameterName.Substring(1); 
+			runner.<%= varName %> = <%= varName %>;
+~			} 
+			
+			runner.Execute(tr.Connection, tr);
+
+~			foreach (SqlParameter p in sp.Parameters)
+~			{
+~				if (p.Direction == ParameterDirection.ReturnValue) continue;
+~				if (p.Direction == ParameterDirection.Input) continue;
+~				string varName = p.ParameterName.Substring(1);
+			<%= varName %> = runner.<%= varName %>;
+~			}
+		}
+		
+		#endregion
+
+~		int crLen = sp.CommandResult.Count;
+~		if (crLen > 0)
+~		{
+		#region Reader helpers
+~		for (int cri = 0; cri < sp.CommandResult.Count; cri++)
+~		{
+~			DbCommandResult cr = sp.CommandResult[cri];
+~			int n = 0;
+~			foreach (DbColumn crCol in cr.Columns)
+~			{
+~				string colName = crCol.ColumnName;
+~				string nx = sp.CommandResult.Count > 1 ? cri.ToString() : "";
+		static public <%= crCol.DataType.Name %> Read<%= nx %><%= colName %>(SqlDataReader rd)
+		{
+			return rd.Get<%= crCol.DataType.Name %>(<%= n %>);
+		}
+		static public bool Is<%= nx %><%= colName %>Null(SqlDataReader rd)
+		{
+			return rd.IsDBNull(<%= n %>);
+		}
+~				n++;
+~			}
+~		}
+
+		#endregion
+~		}
+	}
+~ } 
+}
+
+%%%%%%%%%%%%%%%%%
+
+		
+		public string [] StoredProcedureDaElaborare()
+		{
+			ArrayList r = new ArrayList();
+			XmlNodeList n = Config.DocumentElement.SelectNodes("StoredProcedure");
+			foreach (XmlElement e in n)
+				r.Add(e.GetAttribute("Name"));
+				
+			return (string []) r.ToArray(typeof(string));
+		}
+
+		protected override void OnStart()
+		{
+			string cn = GetConfigOrDie("ConnectionString");
+			string db = GetConfigOrDie("DB");
+			
+			try
+			{
+				DbServer dbs = new DbServer(cn);
+				this.DB = dbs.GetDB(db);
+				if (this.DB == null) Error("Non riesco a a trovare il DB '{0}'", db);
+			}
+			catch (Exception ex)
+			{
+				Error(ex.Message);
+			}
+		}
+		
+		DbInst DB;
+		
+		
+		public override void Help()
+		{
+			Console.Error.WriteLine("SPDriver.gen:");
+			Console.Error.WriteLine("Genera classi C# per lanciare stored procedure.");
+			
+			Console.Error.WriteLine();
+			Console.Error.WriteLine(@"<CodeGen ");
+			Console.Error.WriteLine(@" ConnectionString=""user id=sa;password=bilaterali;data source='Bilsvr1'""");
+			Console.Error.WriteLine(@" DB=""Bipex""");
+			Console.Error.WriteLine(@" FileGen=""SPDriver.gen""");
+			Console.Error.WriteLine(@" FileOut=""SPDriver.cs"" >");
+			Console.Error.WriteLine(@" <StoredProcedure Name='Offerta_Modifica'/>");
+			Console.Error.WriteLine(@" <StoredProcedure Name='Offerta_Nascondi'/>");
+			Console.Error.WriteLine(@" <StoredProcedure Name='Offerta_Nuova'/>");
+			Console.Error.WriteLine(@"</CodeGen>");
+		}
+
+

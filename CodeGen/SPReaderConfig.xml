@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<CodeGen 
+	ConnectionString="user id=sa;password=bilaterali;data source='Bilsvr1'"
+	DB="Bipex"
+	FileGen="SPReader.gen"
+	FileOut="SPReader.cs" >
+	
+	<StoredProcedure Name='SessioneCorrente_Offerta' />
+	<StoredProcedure Name='SessioneCorrente_BookRiassuntivo' />
+	<StoredProcedure Name='SessioneCorrente_BookSingoloContratto' />
+	<StoredProcedure Name='SessioneCorrente_DailyActivity' />
+	<StoredProcedure Name='SessioneCorrente_DailyActivityLog' />
+	<StoredProcedure Name='SessioneCorrente_MarketSession' />
+	<StoredProcedure Name='SessioneCorrente_OpenOrders' />
+	<StoredProcedure Name='SessioneCorrente_SaldoFisico' />
+	<StoredProcedure Name='SessioneCorrente_ListaContratti' />
+	<StoredProcedure Name='GetDatiContratto' />
+	<StoredProcedure Name='GetDatiOfferta' />
+	<StoredProcedure Name='GetDatiSessioneContratto' />
+	<StoredProcedure Name='GetDatiSessione' />
+	<StoredProcedure Name='GetOreDiFornitura' />
+	<StoredProcedure Name='GetListaOperatoriOTC' />
+
+</CodeGen>

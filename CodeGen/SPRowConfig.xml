@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<CodeGen 
+	ConnectionString="user id=sa;password=bilaterali;data source='Bilsvr1'" 
+	DB="Bipex"
+	FileGen="SPRow.gen"
+	FileOut="SPRow.cs" >
+	
+	<StoredProcedure Name='GetDatiContratto'>
+		<Result Name='DatiContratto' />
+	</StoredProcedure>
+
+	<StoredProcedure Name='GetDatiOfferta'>
+		<Result Name='DatiOfferta'>
+			<ColumnMapping Name='OffertaNelBook'  Code ='{0} > 0' Type='bool' />
+			<ColumnMapping Name='TipoOfferta'     Code ='(Offerta_Tipo)Enum.Parse(typeof(Offerta_Tipo), {0}, true)' Type='Offerta_Tipo' />
+			<ColumnMapping Name='StatoOfferta'    Code ='(Offerta_Stato)Enum.Parse(typeof(Offerta_Stato), {0}, true)' Type='Offerta_Stato' />
+			<ColumnMapping Name='OffertaAMercato' Code ='{0} == "S"' Type='bool' />
+		</Result>
+	</StoredProcedure>
+
+	<StoredProcedure Name='GetDatiSessione'>
+		<Result Name='DatiSessione'/>
+	</StoredProcedure>
+
+	<StoredProcedure Name='GetDatiSessioneContratto'>
+		<Result Name='DatiSessioneContratto'/>
+	</StoredProcedure>
+
+	<StoredProcedure Name='GetOreDiFornitura'>
+		<Result Name='DatiOreFornitura'/>
+	</StoredProcedure>
+
+	<StoredProcedure Name='GetListaOperatoriOTC'>
+		<Result Name='OperatoreOTC'>
+			<Code>
+		public override string ToString()
+		{
+			return nnRagioneSociale;
+		}
+	</Code>
+
+			
+		</Result>
+	</StoredProcedure>
+
+	<StoredProcedure Name='SessioneCorrente_ListaContratti'>
+		<Result Name='ListaContrattiRow'/>
+	</StoredProcedure>
+</CodeGen>

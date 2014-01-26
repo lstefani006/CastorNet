@@ -1,0 +1,209 @@
+using System.Collections.Specialized;
+using System.Data;
+using System.Data.SqlClient;
+using System.Collections;
+using System.Xml;
+
+%%%%%%%%%%%%%%%%%
+using System; 
+using System.Data; 
+using Bipex_BLInterface; 
+namespace SPDriver 
+{ 
+// i campi hanno prefisso 
+// nn    se Non sono Nullabili 
+// nu    se sono NUllabili 
+~	foreach (string spName in StoredProcedureDaElaborare())
+~	{
+~		DbStoredProcedure sp = DB.StoredProcedures[spName];
+~		int crLen = sp.CommandResult.Count;
+~		if (crLen == 0) Error("La sp {0} non ha bisogno di un reader", sp.Name);
+~
+~		for (int cri = 0; cri < crLen; cri++)
+~		{
+~			DbCommandResult cr = sp.CommandResult[cri];
+~			string crN = (crLen == 1) ? "" : cri.ToString();
+~			string className = GetResultName(sp.Name, cri);
+~			string optCode   = GetOptCode(sp.Name, cri);
+~			if (className == null) break;
+
+	[Serializable] 
+	public class <%= className %>
+	{
+~	if (optCode != "")
+~	{
+<%= optCode %>
+~	}
+~			int nn = 0;
+~			int w = "bool".Length;
+~			foreach (DbColumn crCol in cr.Columns)
+~			{
+~				string colType = GetVarType(sp.Name, className, crCol, nn);
+~				if (colType.Length > w) w = colType.Length;
+~			}
+~			nn = 0;
+~			foreach (DbColumn crCol in cr.Columns)
+~			{
+~				string colName = GetVarName(crCol);
+~				string colType = GetVarType(sp.Name, className, crCol, nn);
+~				bool   colNullable = crCol.AllowDBNull;
+~				
+		public <%= colType.PadRight(w) %> <%= colNullable ? "nu" : "nn" %><%= colName %>;
+~				if (colNullable)
+~				{
+		public <%= "bool".PadRight(w) %> <%= colNullable ? "nu" : "nn" %><%= colName %>Null;
+~				}
+~				nn++;
+~			}
+
+		public void Read(IDataReader rd)
+		{
+~			nn = 0;
+~			foreach (DbColumn crCol in cr.Columns)
+~			{
+~				string colName = GetVarName(crCol);
+~				string colType = GetVarType(sp.Name, className, crCol, nn);
+~				bool   colNullable = crCol.AllowDBNull;
+~				string varName = (colNullable ? "nu" : "nn") + colName;
+~				string varNameNull = varName + "Null";
+~				string ass = string.Format("this.{0} = rd.Get{1}({2})", varName, colType, nn);
+~				if (IsColumnMapping(sp.Name, className, crCol)) ass = GetAss(sp.Name, className, crCol, varName, nn);
+~				if (colNullable)
+~				{
+			this.<%= varNameNull %> = rd.IsDBNull(<%= nn %>);
+			if (!this.<%= varNameNull %>) <%= ass %>;
+~				}
+~				else
+~				{
+			<%= ass %>;
+~				}
+~				nn++;
+~			}
+		}
+	}
+~		}
+~	}
+}
+%%%%%%%%%%%%%%%%%
+
+		protected override void OnStart()
+		{
+			string cn = GetConfigOrDie("ConnectionString");
+			string db = GetConfigOrDie("DB");
+			
+			try
+			{
+				DbServer dbs = new DbServer(cn);
+				this.DB = dbs.GetDB(db);
+				if (this.DB == null) Error("Non riesco a a trovare il DB '{0}'", db);
+			}
+			catch (Exception ex)
+			{
+				Error(ex.Message);
+			}
+		}
+		
+		DbInst DB;
+		
+		public override void Help()
+		{
+			Console.Error.WriteLine("SPRow.gen:");
+			Console.Error.WriteLine("Genera le classi C# per memorizzare i record ritornati da una o piu` stored procedure.");
+			Console.Error.WriteLine("La/le stored procedure possono ritornare piu` tabelle.");
+			
+			Console.Error.WriteLine();
+			Console.Error.WriteLine("<CodeGen");
+			Console.Error.WriteLine(" ConnectionString='stringa di connesssione utente sa'");
+			Console.Error.WriteLine(" DB='nome del database'");
+			Console.Error.WriteLine(">");
+			Console.Error.WriteLine(" <StoredProcedure Name='NomeDellaSP' >");
+			Console.Error.WriteLine("  <Result Name='NomeDellaClasseDaGenerare'>");
+			Console.Error.WriteLine("   <ColumnMapping Name='NomeDellaColonna' Code='espressione di conversione' Type='tipo C# della colonna' >");
+			Console.Error.WriteLine("  </Result>");
+			Console.Error.WriteLine(" </StoredProcedure>");
+			Console.Error.WriteLine("</CodeGen>");
+			
+			Console.Error.WriteLine();
+			Console.Error.WriteLine("Si possono avere piu` elementi <StoredProcedure>.");
+			Console.Error.WriteLine("Ogni sp puo` ritornare piu` tabelle --> si hanno piu` elementi <Result>");
+			Console.Error.WriteLine("Ogni result puo` specificare delle regole di conversione per colonna.");
+			Console.Error.WriteLine("Es:");
+			Console.Error.WriteLine("   <ColumnMapping Name='Abilitato' Code='{0} == \"S\"' Type='bool' >");
+		}
+		
+		
+		bool IsColumnMapping(string spName, string className, DbColumn c)
+		{
+			string q = string.Format("StoredProcedure[@Name='{0}']/Result[@Name='{1}']/ColumnMapping[@Name='{2}']", spName, className, c.Name);
+			XmlNode n = Config.DocumentElement.SelectSingleNode(q);
+			return n != null;
+		}
+		
+		string GetAss(string spName, string className, DbColumn c, string varName, int nn)
+		{
+			string q = string.Format("StoredProcedure[@Name='{0}']/Result[@Name='{1}']/ColumnMapping[@Name='{2}']", spName, className, c.Name);
+			XmlNode n = Config.DocumentElement.SelectSingleNode(q);
+			string fmt = ((XmlElement)n).GetAttribute("Code");
+			string v = string.Format("rd.Get{0}({1})", c.DataType.Name, nn);
+			string code = string.Format(fmt, v);
+			string ass = string.Format("this.{0} = {1}", varName, code);
+			return ass;
+		}
+
+		
+		string GetVarType(string spName, string className, DbColumn c, int nn)
+		{
+			string q = string.Format("StoredProcedure[@Name='{0}']/Result[@Name='{1}']/ColumnMapping[@Name='{2}']", spName, className, c.Name);
+			XmlNode n = Config.DocumentElement.SelectSingleNode(q);
+			if (n == null)
+				return c.DataType.Name;
+			
+			return ((XmlElement)n).GetAttribute("Type");
+		}
+		
+		
+		string GetVarName(DbColumn c)
+		{
+			return c.Name;
+		}
+		
+		/////////////////////////////////
+		
+
+		string [] StoredProcedureDaElaborare()
+		{
+			ArrayList r = new ArrayList();
+			XmlNodeList n = Config.DocumentElement.SelectNodes("StoredProcedure");
+			foreach (XmlElement e in n)
+				r.Add(e.GetAttribute("Name"));
+				
+			return (string []) r.ToArray(typeof(string));
+		}
+
+		string GetResultName(string spName, int i)
+		{
+			string q = string.Format("StoredProcedure[@Name='{0}']", spName);
+			XmlNode n = Config.DocumentElement.SelectSingleNode(q);
+
+		
+			XmlNodeList r = n.SelectNodes("Result");
+			XmlElement e = (XmlElement) r[i];
+			if (e == null) return null;
+			return e.GetAttribute("Name");
+		}
+
+		string GetOptCode(string spName, int i)
+		{
+			string q = string.Format("StoredProcedure[@Name='{0}']", spName);
+			XmlNode n = Config.DocumentElement.SelectSingleNode(q);
+
+		
+			XmlNodeList r = n.SelectNodes("Result");
+			XmlElement e = (XmlElement) r[i];
+			if (e == null) return "";
+
+			XmlElement ec = (XmlElement)e.SelectSingleNode("Code");
+			if (ec == null) return "";
+
+			return ec.InnerText;
+		}

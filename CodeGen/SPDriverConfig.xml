@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<CodeGen 
+	ConnectionString="user id=sa;password=bilaterali;data source='Bilsvr1'"
+	DB="Bipex"
+	FileGen="SPDriver.gen"
+	FileOut="SPDriver.cs" >
+	
+	<StoredProcedure Name='Offerta_Lock'/>
+	<StoredProcedure Name='Offerta_Modifica'/>
+	<StoredProcedure Name='Offerta_Nascondi'/>
+	<StoredProcedure Name='Offerta_Nuova'/>
+	<StoredProcedure Name='Offerta_Revoca'/>
+	<StoredProcedure Name='Offerta_Rivela'/>
+	<StoredProcedure Name='OraCorrente'/>
+
+	<!--
+	<StoredProcedure Name='SessioneCorrente_Offerta'/>
+	<StoredProcedure Name='SessioneCorrente_BookRiassuntivo'/>
+	<StoredProcedure Name='SessioneCorrente_BookSingoloContratto'/>
+	<StoredProcedure Name='SessioneCorrente_DailyActivity'/>
+	<StoredProcedure Name='SessioneCorrente_ListaContratti'/>
+	<StoredProcedure Name='SessioneCorrente_OpenOrders'/>
+	<StoredProcedure Name='SessioneCorrente_MarketSession'/>
+	<StoredProcedure Name="SessioneCorrente_SaldoFisico"/>
+	-->
+
+	<StoredProcedure Name='SessioneCorrente_CambiaStato'/>
+	
+	<!--
+	<StoredProcedure Name="GetDatiContratto"/>
+	<StoredProcedure Name="GetDatiOfferta"/>
+	<StoredProcedure Name="GetDatiSessione"/>
+	<StoredProcedure Name="GetDatiSessioneContratto"/>
+	<StoredProcedure Name="GetOreDiFornitura"/>
+	<StoredProcedure Name="GetListaOperatoriOTC"/>
+	-->
+	
+	<StoredProcedure Name="LeggiParametri"/>
+
+	<StoredProcedure Name="MessaggioIn_Insert"/>
+	<StoredProcedure Name="MessaggioOut_Insert"/>
+	<StoredProcedure Name="TransazioneIn_Insert"/>
+	<StoredProcedure Name="TransazioneOut_Insert"/>
+
+</CodeGen>

@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<CodeGen 
+	ConnectionString="Data Source=XE;User ID=HR;Password=spectrum"
+	Owner="HR"
+	FileGen="OraPackage.gen"
+	FileOut="OraPackage.cs" >
+
+  <Package Name='PACK_HELLO_WORLD'/>
+</CodeGen>

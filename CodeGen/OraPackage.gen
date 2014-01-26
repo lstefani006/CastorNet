@@ -1,0 +1,149 @@
+using System.Collections.Specialized;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Xml;
+using System.Collections;
+using Utility;
+
+%%%%%%%%%%%%%%%%%
+using System; 
+using System.Data; 
+using System.Data.SqlClient; 
+using System.Data.SqlTypes; 
+
+namespace PackageDriver 
+{ 
+~	foreach (string pckName in PackageDaElaborare())
+~	{
+	public class <%= pckName %>
+	{
+~		U2.NamedList<OracleSchema.Package> pcks = DB.GetPackages(Owner, pckName);
+~		OracleSchema.Package pkg = pcks[0];
+~		foreach (OracleSchema.Procedure proc in pkg.Procedure)
+~		{
+			public void <%= proc.Name %>(<%= GetArgs(proc) %>)
+			{
+				OracleCommand cmd = cn.CreateCommand();
+				cmd.CommandType = CommandType.StoredProcedure;
+				cmd.Text = "<%= pckName %>.<%= proc.Name %>";
+			}
+			
+~		}
+	}
+~	}
+}
+
+%%%%%%%%%%%%%%%%%
+
+		public string GetArgs(OracleSchema.Procedure proc)
+		{
+			if (proc.Argument.Count == 0)
+				return "";
+			
+			string r = "";
+			foreach (OracleSchema.ProcedureArgument a in proc.Argument)
+			{
+				r += GetArg(a);
+				if (!proc.Argument.IsLast(a))
+					r += ", ";
+			}
+			
+			return r;
+		}
+		
+		public string ToNetType(string oracleType)
+		{
+			switch (oracleType.ToLower())
+			{
+				case "varchar2"   : return "string";
+				case "nvarchar2"  : return "string";
+				case "number"     : return "decimal";
+				case "ref cursor" : return "OracleDataReader";
+				default           : return oracleType;
+			}
+		}
+		
+		public string GetArg(OracleSchema.ProcedureArgument a)
+		{
+			string r = "";
+			
+			if (a.Type.ToLower() == "ref cursor")
+			{
+				r += "OracleDataReader ";
+				r += a.Name;
+			}
+			else
+			{
+				if (a.Direction == OracleSchema.ParameterDirection.In)
+				{
+					 r += "";
+				}
+				else if (a.Direction == OracleSchema.ParameterDirection.InOut)
+				{
+					r += "ref ";
+				}
+				else if (a.Direction == OracleSchema.ParameterDirection.Out)
+				{
+					r += "out ";
+				}
+				r += ToNetType(a.Type);
+				r += " ? ";
+				r += a.Name;
+			}
+			return r;
+		}
+		
+		public string [] PackageDaElaborare()
+		{
+			ArrayList r = new ArrayList();
+			XmlNodeList n = Config.DocumentElement.SelectNodes("Package");
+			foreach (XmlElement e in n)
+				r.Add(e.GetAttribute("Name"));
+				
+			return (string []) r.ToArray(typeof(string));
+		}
+
+		protected override void OnStart()
+		{
+			string cn = GetConfigOrDie("ConnectionString");
+			Owner = GetConfigOrDie("Owner");
+			
+			try
+			{
+				DB = new OracleSchema.SchemaBuilder(cn);
+			}
+			catch (Exception ex)
+			{
+				Error(ex.Message);
+			}
+		}
+		
+		protected override void OnEnd()
+		{
+			if (DB !=  null)
+				DB.Dispose();
+		}
+
+		
+		OracleSchema.SchemaBuilder DB;
+		string Owner;
+	
+		public override void Help()
+		{
+			Console.Error.WriteLine("OraPackage.gen:");
+			Console.Error.WriteLine("Genera classi C# per lanciare stored procedure entro un package.");
+			
+			Console.Error.WriteLine();
+			Console.Error.WriteLine(@"<CodeGen ");
+			Console.Error.WriteLine(@" ConnectionString=""Data Source=localhost;User ID=HR;Password=pippo""");
+			Console.Error.WriteLine(@" DB=""HR""");
+			Console.Error.WriteLine(@" FileGen=""OraPackage.gen""");
+			Console.Error.WriteLine(@" FileOut=""OraPackage.cs"" >");
+			Console.Error.WriteLine(@" <StoredProcedure Name='NomePackage1'/>");
+			Console.Error.WriteLine(@" <StoredProcedure Name='NomePackage2'/>");
+			Console.Error.WriteLine(@" <StoredProcedure Name='NomePackage3'/>");
+			Console.Error.WriteLine(@"</CodeGen>");
+		}
+
+
