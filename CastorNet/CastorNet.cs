@@ -195,16 +195,9 @@ namespace CastorNet
 	public class ComparableList<T> : IComparable<ComparableList<T>> where T : IComparable<T>
 	{
 		public ComparableList() { _v = new List<T>(); }
-		public ComparableList(ComparableList<T> c)
-		{
-			_v = new List<T>();
-			_v.AddRange(c._v);
-		}
-		public ComparableList(IList<T> c)
-		{
-			_v = new List<T>();
-			_v.AddRange(c);
-		}
+		public ComparableList(ComparableList<T> c) : this() { _v.AddRange(c._v); }
+		public ComparableList(IList<T> c) : this() { _v.AddRange(c); }
+
 		public int CompareTo(ComparableList<T> c)
 		{
 			int r = c._v.Count.CompareTo(this._v.Count);
@@ -230,8 +223,6 @@ namespace CastorNet
 			return sb.ToString();
 		}
 
-		List<T> _v;
-
 		public T this[int index]
 		{
 			get { return _v[index]; }
@@ -242,13 +233,9 @@ namespace CastorNet
 
 		public void Add(T v) { _v.Add(v); }
 
-		public ComparableList<T> Tail
-		{
-			get
-			{
-				return new ComparableList<T>(_v.GetRange(1, _v.Count - 1));
-			}
-		}
+		public ComparableList<T> Tail { get { return new ComparableList<T>(_v.GetRange(1, _v.Count - 1)); } }
+
+		List<T> _v;
 	}
 
 	///////////////////////////////////////////////////////////////
@@ -808,3 +795,32 @@ namespace CastorNet
 		}
 	}
 }
+
+namespace CastorNetTest
+{
+	using CastorNet;
+
+	class _
+	{
+		static void Test()
+		{
+			Ref<ComparableList<int>> list = new Ref<ComparableList<int>>();
+			Ref<int> v = new Ref<int>();
+
+			R r = R.member(list, v)
+				& v > 10
+				& v < 20;
+
+			list.Value.Add(1);
+			list.Value.Add(10);
+			list.Value.Add(11);
+			list.Value.Add(30);
+
+			foreach (var n in r.Exec())
+			{
+				Console.WriteLine("{0}", v.Value);
+			}
+		}
+	}
+}
+

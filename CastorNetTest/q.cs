@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
 
-
+[Serializable]
 public class RecNode
 {
 	public int f_NodeId { get; set; }

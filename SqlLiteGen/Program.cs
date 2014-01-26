@@ -16,14 +16,22 @@ namespace SqlLiteGen
 		public string dataType;
 		public bool primary;
 		public bool isNullable;
+		public string csType;
 	}
 	class Program
 	{
 		static void Main(string[] args)
 		{
+			if (args.Length != 1)
+			{
+				Console.WriteLine("Usage: SqlLiteGen <file.db>");
+				return;
+			}
+
 			using (SQLiteConnection cn = new SQLiteConnection())
 			{
-				cn.ConnectionString = @"data source=C:\Sviluppo\enr_trunk\Monetica\Debug\enr.db";
+				//cn.ConnectionString = @"data source=C:\Sviluppo\enr_trunk\Monetica\Debug\enr.db";
+				cn.ConnectionString = "data source=" + args[0];
 				cn.Open();
 
 				U.CsStreamWriter cs = new U.CsStreamWriter(Console.Out);
@@ -32,7 +40,6 @@ namespace SqlLiteGen
 				cs.WriteLine("using System.Collections.Generic;");
 				cs.WriteLine("using System.Data.SQLite;");
 				cs.WriteLine();
-
 
 				var tbs = cn.GetSchema("tables");
 				foreach (DataRow tb in tbs.Rows)
@@ -43,11 +50,11 @@ namespace SqlLiteGen
 						continue;
 
 					cs.WriteLine();
+					cs.WriteLine("[Serializable]");
 					cs.WriteLine("public partial class Rec{0}", tableName);
 					cs.WriteLine("{");
 
 					var cols = new List<Col>();
-
 					foreach (DataRow col in cn.GetSchema("columns").Rows)
 					{
 						string coltb = col["TABLE_NAME"].ToString();
@@ -60,28 +67,29 @@ namespace SqlLiteGen
 						c.primary = (bool)col["PRIMARY_KEY"];
 						c.isNullable = (bool)col["IS_NULLABLE"];
 
+						switch (c.dataType)
+						{
+						case "int": c.csType = "int"; break;
+						case "char": c.csType = "string"; break;
+						case "nvarchar": c.csType = "string"; break;
+						case "bool": c.csType = "bool"; break;
+						case "date": c.csType = "DateTime"; break;
+						case "time": c.csType = "TimeSpan"; break;
+						}
+						if (c.isNullable)
+						{
+							if (c.csType != "string")
+								c.csType += "?";
+						}
+
 						cols.Add(c);
 					}
 
+					////////////
+
 					foreach (Col col in cols)
 					{
-						string csType = null;
-						switch (col.dataType)
-						{
-						case "int": csType = "int"; break;
-						case "char": csType = "string"; break;
-						case "nvarchar": csType = "string"; break;
-						case "bool": csType = "bool"; break;
-						case "date": csType = "DateTime"; break;
-						case "time": csType = "TimeSpan"; break;
-						}
-						if (col.isNullable)
-						{
-							if (csType != "string")
-								csType += "?";
-						}
-						
-						cs.WriteLine("public {0} f_{1} {{ get; set; }}", csType, col.colName);
+						cs.WriteLine("public {0} f_{1} {{ get; set; }}", col.csType, col.colName);
 					}
 
 					cs.WriteLine();
@@ -125,7 +133,7 @@ namespace SqlLiteGen
 									cs.WriteLine("f_{0} = rd.GetDateTime({1});", col.colName, colNum);
 								break;
 
-							case "time": 
+							case "time":
 								if (col.isNullable)
 									cs.WriteLine("f_{0} = rd.IsDBNull({1}) ? (TimeSpan?)null : rd.GetTimeSpan({1});", col.colName, colNum);
 								else
@@ -165,16 +173,95 @@ namespace SqlLiteGen
 						cs.WriteLine("}");
 					}
 
+					// LoadPK
 					cs.WriteLine();
 					if (true)
 					{
-						int colNum = 0;
+						StringBuilder sb = new StringBuilder();
 						foreach (var col in cols)
 						{
-							cs.WriteLine("public static readonly string c_{0} = \"{0}\";", col.colName);
-							colNum += 1;
+							if (!col.primary) continue;
+							sb.AppendFormat(", {0} {1}", col.csType, col.colName);
 						}
+
+						cs.WriteLine("public bool LoadPK(SQLiteConnection cn{0})", sb.ToString());
+						cs.WriteLine("{");
+						cs.WriteLine("using(var cmd = CreateCommandSelect(cn))");
+						cs.WriteLine("{");
+
+						sb.Clear();
+						int n = 0;
+						foreach (var col in cols)
+						{
+							if (!col.primary) continue;
+							if (n > 0) sb.Append(" AND");
+							sb.AppendFormat(" {0} = @{1}", col.colName, n++);
+						}
+
+						cs.WriteLine("cmd.CommandText += \" WHERE{0}\";", sb.ToString());
+						n = 0;
+						foreach (var col in cols)
+							if (col.primary)
+								cs.WriteLine("cmd.Parameters.AddWithValue(\"@{0}\", {1});", n++, col.colName);
+
+						cs.WriteLine("using (var rd = cmd.ExecuteReader())");
+						cs.WriteLine("{");
+						cs.WriteLine("if (rd.Read())");
+						cs.WriteLine("{");
+						cs.WriteLine("this.Read(rd);");
+						cs.WriteLine("if (rd.Read()) throw new Exception(\"Invalid db\");");
+						cs.WriteLine("return true;");
+						cs.WriteLine("}");
+						cs.WriteLine("}");
+						cs.WriteLine("return false;");
+
+						cs.WriteLine("}");
+						cs.WriteLine("}");
 					}
+
+					// Insert
+					if (true)
+					{
+						cs.WriteLine("public void Insert(SQLiteConnection cn{0})");
+						cs.WriteLine("{");
+						cs.WriteLine("using(var cmd = cn.CreateCommand(cn))");
+						cs.WriteLine("{");
+
+						StringBuilder sb = new StringBuilder();
+						sb.AppendFormat("INSERT INTO {0}(", tableName);
+						bool first = true;
+						foreach (var col in cols)
+						{
+							if (first) { first = false; } else { sb.Append(", "); }
+							sb.Append(col.colName);
+						}
+						sb.Append(") VALUES (");
+						first = true;
+						int n = 0;
+						foreach (var col in cols)
+						{
+							if (first) { first = false; } else { sb.Append(", "); }
+							sb.AppendFormat("@{0}", n++);
+						}
+						sb.Append(")");
+						cs.WriteLine("cmd.CommandText = \"{0}\";", sb.ToString());
+
+						n = 0;
+						foreach (var col in cols)
+							if (col.isNullable)
+								cs.WriteLine("cmd.Parameters.AddWithValue(\"@{0}\", f_{1}.HasValue ? f_{1}.Value : DBNull.Value);", n++, col.colName);
+							else
+							cs.WriteLine("cmd.Parameters.AddWithValue(\"@{0}\", f_{1});", n++, col.colName);
+
+						cs.WriteLine("cmd.ExecuteScalar();");
+						cs.WriteLine("}");
+						cs.WriteLine("}");
+					}
+
+
+					cs.WriteLine();
+					foreach (var col in cols)
+						cs.WriteLine("public static readonly string c_{0} = \"{0}\";", col.colName);
 
 					cs.WriteLine("}");
 				}
