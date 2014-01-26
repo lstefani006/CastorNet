@@ -124,6 +124,10 @@
       <Project>{c3742659-33d3-41a0-a05b-c0cdcf157c05}</Project>
       <Name>CastorNet</Name>
     </ProjectReference>
+    <ProjectReference Include="..\U\U.csproj">
+      <Project>{5f9250f8-13ef-4983-93e4-68296603be78}</Project>
+      <Name>U</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{3259AA49-8AA1-44D3-9025-A0B520596A8C}" />

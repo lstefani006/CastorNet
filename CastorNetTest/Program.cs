@@ -391,7 +391,6 @@ namespace CastorNetTest
 						Console.WriteLine("{0}", node.NodeId, node.Branches.ToList());
 					}
 				}
-
 			}
 
 

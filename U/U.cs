@@ -120,9 +120,7 @@ public static partial class U
 	public static IEnumerable<List<T>> Group<T>(IEnumerable<T> l, SameGroup<T> sameGroup)
 	{
 		List<T> ret = new List<T>();
-
 		T last = default(T);
-
 		foreach (T t in l)
 		{
 			if (ret.Count > 0 && sameGroup(last, t) == false)
@@ -130,21 +128,16 @@ public static partial class U
 				yield return ret;
 				ret = new List<T>();
 			}
-
 			ret.Add(t);
-
 			last = t;
 		}
-
 		if (ret.Count > 0)
 			yield return ret;
 	}
 	public static IEnumerable<List<T>> Group<T>(IEnumerable l, SameGroup<T> sameGroup)
 	{
 		List<T> ret = new List<T>();
-
 		T last = default(T);
-
 		foreach (T t in l)
 		{
 			if (ret.Count > 0 && sameGroup(last, t) == false)
@@ -152,12 +145,9 @@ public static partial class U
 				yield return ret;
 				ret = new List<T>();
 			}
-
 			ret.Add(t);
-
 			last = t;
 		}
-
 		if (ret.Count > 0)
 			yield return ret;
 	}

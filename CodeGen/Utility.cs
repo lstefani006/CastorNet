@@ -61,17 +61,14 @@ namespace Utility
 			return ret.ToArray();
 		}
 
-
-
-
 		public delegate bool SameGroup<T>(T a, T b);
-		public static IEnumerable<List<T>> Group<T>(IEnumerable<T> l, SameGroup<T> sameGroup)
+		public static IEnumerable<List<T>> Group<T>(IEnumerable<T> list, SameGroup<T> sameGroup)
 		{
 			List<T> ret = new List<T>();
 
 			T last = default(T);
 
-			foreach (T t in l)
+			foreach (T t in list)
 			{
 				if (ret.Count > 0 && sameGroup(last, t) == false)
 				{
@@ -87,13 +84,13 @@ namespace Utility
 			if (ret.Count > 0)
 				yield return ret;
 		}
-		public static IEnumerable<List<T>> Group<T>(IEnumerable l, SameGroup<T> sameGroup)
+		public static IEnumerable<List<T>> Group<T>(IEnumerable list, SameGroup<T> sameGroup)
 		{
 			List<T> ret = new List<T>();
 
 			T last = default(T);
 
-			foreach (T t in l)
+			foreach (T t in list)
 			{
 				if (ret.Count > 0 && sameGroup(last, t) == false)
 				{
@@ -109,6 +106,8 @@ namespace Utility
 			if (ret.Count > 0)
 				yield return ret;
 		}
+
+		////////////////////////////////////////////////////////////
 
 		public interface INamedObject
 		{
