@@ -2,11 +2,40 @@
 # lista dei file da committare 
 git status .
 
+
+# per aggiungere un nuovo file in index (staging)
+# o per memorizzare le modifiche ad un file esistente sempre nell'index
+git add pippo.txt
+
+# per aggiungere all'index tutta una dir e sotto dir
+# NB. non aggiunge i file, ma mette i file nell'index
+git add .
+
+# per recurerare un file dall'index PRIMA di aver fatto "add"
+git checkout pippo.txt
+
 # per committare un file
 git commit pippo.txt
 
-# per aggiungere un nuovo file al git
-git add pippo.txt
+# per recuperare un file dopo "add" ma PRIMA del "commit"
+git reset HEAD pippo.txt
+
+# per riportare l'HEAD allo stato dell'ultimo commit
+# (in pratica per annullare tutti gli "add")
+git reset HEAD     
+git checkout      # riporta HEAD sul disco 
+
+
+# per vedere la lista dei commit
+git log --pretty=oneline --abbrev-commit
+
+# per fare revert ad una versione
+git revert <numero>
+
+# per creare un tag 
+git tag v2.3.4.5 <numero>
+git tag v51                   # crea un tag sull'ultimo commit
+
 
 # per vedere gli alias remoti
 git remove -v
@@ -16,7 +45,6 @@ git remote add origin https://github.com/lstefani006/CastorNet.git
 
 # per mandare i file modificati al server GitHUB
 git push origin master
-
 
 # per ottenere i file modificati dal sever GitHUB
 git pull origin master

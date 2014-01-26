@@ -31,11 +31,11 @@ public static partial class U
 		a = b;
 		b = t;
 	}
+
 	public static string F(string fmt, params object[] args)
 	{
 		return string.Format(CultureInfo.InvariantCulture, fmt, args);
 	}
-
 
 
 	public static IEnumerable<int> Count(int a, int b)
