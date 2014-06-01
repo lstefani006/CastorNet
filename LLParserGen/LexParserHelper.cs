@@ -58,11 +58,11 @@ partial class RegexprParser : ParserBase
 		}
 	}
 
-	public List<Tuple<RegRoot, string>> LexerActions = new List<Tuple<RegRoot, string>>();
+	public List<U.Tuple<RegRoot, string>> LexerActions = new List<U.Tuple<RegRoot, string>>();
 
 	private void AddRole(RegRoot r, string id)
 	{
-		LexerActions.Add(Tuple.Create(r, id));
+		LexerActions.Add(U.Tuple<RegRoot, string>.Create(r, id));
 	}
 }
 

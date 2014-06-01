@@ -38,13 +38,13 @@ class GrammarReader
 	RegexprParser _regExprParser;
 
 	public Grammar G { get; set; }
-	public List<Tuple<RegRoot, string>> LexerActions { get; set; }
+	public List<U.Tuple<RegRoot, string>> LexerActions { get; set; }
 
 	public GrammarReader()
 	{
 		G = new Grammar();
 		_regExprParser = new RegexprParser();
-		LexerActions = new List<Tuple<RegRoot, string>>();
+		LexerActions = new List<U.Tuple<RegRoot, string>>();
 	}
 
 	public void Read(string fileName, TextReader tr, ParserOptions po)
@@ -557,6 +557,25 @@ class Grammar
 	private Dictionary<string, TerminalSet> _follow;
 	private int _tmp;
 
+	public static String ReplaceWorld(String s, String from, String to)
+	{
+		int i = s.IndexOf(from);
+		if (i < 0)
+			return s;
+
+		i += from.Length;
+		if (i == s.Length)
+			return s.Replace(from, to);
+
+		char c = s[i];
+		if ((c >= '0' && c <= '9') || 
+				(c >= 'a' && c <= 'z') || 
+				(c >= 'A' && c <= 'Z') || 
+				c == '_')
+			return s;
+
+		return s.Replace(from, to);
+	}
 
 	public Grammar()
 		: this(1)
@@ -1071,7 +1090,7 @@ class Grammar
 		}
 	}
 
-	public void GenerateCode(List<Tuple<RegRoot, string>> lexerActions, ParserOptions po, U.CsStreamWriter tw)
+	public void GenerateCode(List<U.Tuple<RegRoot, string>> lexerActions, ParserOptions po, U.CsStreamWriter tw)
 	{
 		tw.WriteLine("#pragma warning disable 0168 // variable declared but not used.");
 		tw.WriteLine("#pragma warning disable 0219 // variable assigned but not used.");
@@ -1261,24 +1280,24 @@ class Grammar
 							Debug.Assert(false);
 
 
-						code = code.Replace("$$.i", U.F("{0}_i", p.Symbol));
-						code = code.Replace("$$.s", U.F("{0}_s", p.Symbol));
-						code = code.Replace("$$", U.F("{0}_s", p.Symbol));
+						code = ReplaceWorld(code, "$$.i", U.F("{0}_i", p.Symbol));
+						code = ReplaceWorld(code, "$$.s", U.F("{0}_s", p.Symbol));
+						code = ReplaceWorld(code, "$$",   U.F("{0}_s", p.Symbol));
 						for (int i = 0; i < 1000; ++i)
 						{
 							string k, v;
 
 							k = U.F("${0}.i", i);
 							v = U.F("nt{0}_i", i);
-							code = code.Replace(k, v);
+							code = ReplaceWorld(code, k, v);
 
 							k = U.F("${0}.s", i);
 							v = U.F("nt{0}_s", i);
-							code = code.Replace(k, v);
-
+							code = ReplaceWorld(code, k, v);
+							
 							k = U.F("${0}", i);
 							v = U.F("nt{0}_s", i);
-							code = code.Replace(k, v);
+							code = ReplaceWorld(code, k, v);
 						}
 
 						tw.WriteLine("{0}", code);
@@ -1503,11 +1522,11 @@ class Grammar
 									{
 										string s = g_i.ToString();
 										foreach (var pp in posA)
-											s = s.Replace(U.F("${0}", pp + 1), "(" + aEmptyAction.Substring(1) + ")");
+											s = ReplaceWorld(s, U.F("${0}", pp + 1), "(" + aEmptyAction.Substring(1) + ")");
 										foreach (var pp in posA)
 										{
 											for (int k = pp + 1; k < 100; ++k)
-												s = s.Replace(U.F("${0}", k + 1), U.F("${0}", k));
+												s = ReplaceWorld(s, U.F("${0}", k + 1), U.F("${0}", k));
 										}
 										a_d.Add(new Action(g_new, s));
 									}
@@ -1715,13 +1734,11 @@ class Grammar
 
 							if (action_g != null)
 							{
-								action_g = action_g.Replace("$1", U.F("(({0})$$.i)", p_i.Type));
+								action_g = ReplaceWorld(action_g, "$1", U.F("(({0})$$.i)", p_i.Type));
 
-								for (int ii = 0; ii < 100; ++ii)
-									action_g = action_g.Replace(U.F("${0}", ii + 2), U.F("${0}.s", ii + 1));
-								//action_g = action_g.Replace("$2", "$1.s");
-								//action_g = action_g.Replace("$3", "$2.s");
-								//action_g = action_g.Replace("$4", "$4.s");
+								for (int ii = 0; ii <100; ++ii)
+									action_g = ReplaceWorld(action_g, U.F("${0}", ii + 2), U.F("${0}.s", ii + 1));
+
 								if (action_g.StartsWith("^"))
 									action_g = action_g.Substring(1);
 
@@ -1923,7 +1940,9 @@ class Grammar
 								var aa = r as Action;
 
 								foreach (var dd in ty)
-									aa.Code = aa.Code.Replace(U.F("${0}", dd.Key), U.F("(({1})${0})", dd.Key, dd.Value));
+								{
+									aa.Code = ReplaceWorld(aa.Code, U.F("${0}", dd.Key), U.F("(({1})${0})", dd.Key, dd.Value));
+								}
 							}
 							b_dest.Add(r);
 						}

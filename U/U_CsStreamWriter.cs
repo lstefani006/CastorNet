@@ -37,7 +37,7 @@ public partial class U
 		{
 			_sb.Append(s);
 			s = _sb.ToString(); 
-			_sb.Clear();
+			_sb = new StringBuilder();
 
 			if (s == "{")
 			{
@@ -97,7 +97,7 @@ public partial class U
 		private int _tab;
 		private readonly List<Regex> _stmt;
 		private string _last;
-		private readonly StringBuilder _sb;
+		private StringBuilder _sb;
 
 		private void Tab()
 		{
