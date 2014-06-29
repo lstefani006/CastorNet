@@ -464,20 +464,37 @@ class GrammarReader
 		});
 		acts.Add("\"", (ref NFA.Token tk, LexReader rd, NFA nfa) =>
 		{
+			StringBuilder sb = new StringBuilder();
+			sb.Append("\"");
 			for (; ; )
 			{
 				if (rd.Peek().ch == -1) throw new Exception("EOF in comment");
 				if (rd.Peek().ch == '\n' || rd.Peek().ch == '\r') throw new Exception("return in string");
 				if (rd.Peek().ch == '"')
 				{
-					rd.Read();
+					int ch = rd.Read().ch;
+					sb.Append((char)ch);
 					break;
 				}
-				else
+				else if (rd.Peek().ch == '\\') 
+				{
 					rd.Read();
+					if (rd.Peek().ch == -1) throw new Exception("EOF in comment");
+					if (rd.Peek().ch == '\n' || rd.Peek().ch == '\r') throw new Exception("return in string");
+					if (!(rd.Peek().ch == '"' || rd.Peek().ch == '\\'))
+						throw new Exception("invalid character after \\");
+					int ch = rd.Read().ch;
+					sb.Append((char)ch);
+				}
+				else
+				{
+					int ch = rd.Read().ch;
+					sb.Append((char)ch);
+				}
 			}
 			rd.SetMatch();
 			rd.EndToken(out tk.value, out tk.fileName, out tk.line);
+			tk.value = sb.ToString();
 			tk.token = RegexprParser.STRING;
 			return true;
 		});

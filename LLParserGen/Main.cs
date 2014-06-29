@@ -52,7 +52,7 @@ class _
 				gr.Read(grammarFileName, tr, po);
 			}
 
-			var G = gr.G;
+			var G = gr.G;	
 			var lexerActions = gr.LexerActions;
 
 			if (G.CheckGrammar(Console.Out) == false)
