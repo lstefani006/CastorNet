@@ -11,6 +11,9 @@ git add pippo.txt
 # NB. non aggiunge i file, ma mette i file nell'index
 git add .
 
+# per aggiungere tutti i file modificati (ma gia' presenti nel git)
+git add -u
+
 # per recurerare un file dall'index PRIMA di aver fatto "add"
 git checkout pippo.txt
 
@@ -42,6 +45,8 @@ git remove -v
 
 # per creare un alias remoto
 git remote add origin https://github.com/lstefani006/CastorNet.git
+# oppure
+git remote add origin https://login:password@github.com/lstefani006/CastorNet.git
 
 # per mandare i file modificati al server GitHUB
 git push origin master
