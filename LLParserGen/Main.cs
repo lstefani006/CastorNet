@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.IO;
-using ULib.LLParserLexerLib;
+using LLParserLexerLib;
 using System.Collections.Generic;
 
 class _

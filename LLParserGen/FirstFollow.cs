@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.IO;
 
 
-using ULib.LLParserLexerLib;
+using LLParserLexerLib;
 
 class ParserOptions
 {

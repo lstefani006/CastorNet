@@ -4,7 +4,7 @@
 using System;
 using System.Text;
 using System.Collections.Generic;
-using ULib.LLParserLexerLib;
+using LLParserLexerLib;
 
 public partial class RegexprParser : ParserBase
 {
