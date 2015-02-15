@@ -4,8 +4,16 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace ULib.LLParserLexerLib
+namespace LLParserLexerLib
 {
+	internal static class U
+	{
+		public static string F(string fmt, params object[] args)
+		{
+			return string.Format(System.Globalization.CultureInfo.InvariantCulture, fmt, args);
+		}
+	}
+
 	public class RegAcceptList : IEnumerable<RegAccept>
 	{
 		private List<RegAccept> _a = new List<RegAccept>();
