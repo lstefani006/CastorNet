@@ -1,0 +1,59 @@
+%lexer
+
+/*
+fun                                   ^FUN
+var                                   ^VAR
+del                                   ^DEL
+*/
+
+"+"									  ^(+)
+"-"									  ^(-)
+"*"									  ^(*)
+"/"									  ^(/)
+"("									  ^(()
+")"									  ^())
+/*
+">"									  ^GT
+">="								  ^GE
+"<"		    						  ^LT
+"<="	    						  ^LE
+"=="	    						  ^EQ
+"!="	    						  ^NE
+*/
+(_|[a-z]|[A-Z])(_|[a-z]|[A-Z]|[0-9])* ^ID
+[0-9]+                                ^NUM
+(\ |\n|\r|\t)+                        ^()
+
+
+%parser 
+%parser.class MParser
+%parser.using System
+%parser.namespace LLTest
+
+start<ExprRoot>
+	: e_add            ^$1
+	;
+
+e_add<ExprRoot>
+	: e_add '+' e_mul  ^new ExprAdd($1, $3)
+	| e_add '-' e_mul  ^new ExprSub($1, $3)
+	| e_mul            ^$1
+	;
+
+e_mul<ExprRoot>
+	: e_una            ^$1
+	| e_mul '*' e_una  ^new ExprMul($1, $3)
+	| e_mul '/' e_una  ^new ExprDiv($1, $3)
+	;
+
+e_una<ExprRoot>
+	: e_prim           ^$1
+	| '-' e_una        ^new ExprNeg($2)
+	| '+' e_una        ^new ExprPlus($2)
+	;
+
+e_prim<ExprRoot>
+	: NUM              ^new ExprNum($1)
+	| ID               ^new ExprNum($1)
+	| '(' e_add ')'    ^$2
+	;

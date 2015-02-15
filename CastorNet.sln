@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mips24k", "Mips24k\Mips24k.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LLParserGen", "LLParserGen\LLParserGen.csproj", "{5AFC5C25-AAED-4589-A0D2-E8F99F8B74CD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LLParserGenTest", "LLParserGenTest\LLParserGenTest.csproj", "{E935D682-02FD-4A73-99AA-2A8483F33AD8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,10 @@ Global
 		{D041EC64-4E6E-4EE6-8176-4B8F598290D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D041EC64-4E6E-4EE6-8176-4B8F598290D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D041EC64-4E6E-4EE6-8176-4B8F598290D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E935D682-02FD-4A73-99AA-2A8483F33AD8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E935D682-02FD-4A73-99AA-2A8483F33AD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E935D682-02FD-4A73-99AA-2A8483F33AD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E935D682-02FD-4A73-99AA-2A8483F33AD8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EECD1415-C67C-41EF-8442-AAE348F6D424}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EECD1415-C67C-41EF-8442-AAE348F6D424}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EECD1415-C67C-41EF-8442-AAE348F6D424}.Release|Any CPU.ActiveCfg = Release|Any CPU
