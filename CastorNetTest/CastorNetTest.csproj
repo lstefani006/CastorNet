@@ -106,7 +106,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="app.config" />
     <EntityDeploy Include="EnrGeo.edmx">
       <Generator>EntityModelCodeGenerator</Generator>
       <LastGenOutput>EnrGeo.Designer.cs</LastGenOutput>
