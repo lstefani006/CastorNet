@@ -388,7 +388,7 @@ namespace CastorNetTest
 					foreach (var node in q)
 					{
 						var ww = node.Branches.ToList();
-						Console.WriteLine("{0}", node.NodeId, node.Branches.ToList());
+						Console.WriteLine("{0}", node.NodeId, ww);
 					}
 				}
 			}

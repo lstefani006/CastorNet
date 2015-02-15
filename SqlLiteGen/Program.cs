@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 
+
+
 namespace SqlLiteGen
 {
 	class Col
