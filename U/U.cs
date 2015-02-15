@@ -7,6 +7,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 public static partial class U
 {
+	/*
 	public class Tuple<A, B>
 	{
 		public A Item1;
@@ -20,6 +21,7 @@ public static partial class U
 			return r;
 		}
 	}
+	*/
 
 	public static T DeepCopy<T>(this T src)
 	{
