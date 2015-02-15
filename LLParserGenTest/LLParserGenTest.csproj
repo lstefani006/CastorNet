@@ -37,5 +37,9 @@
       <Project>{5F9250F8-13EF-4983-93E4-68296603BE78}</Project>
       <Name>U</Name>
     </ProjectReference>
+    <ProjectReference Include="..\LLParserGenLib\LLParserGenLib.csproj">
+      <Project>{1B6B0E1F-1270-44A6-860E-C05B761E2408}</Project>
+      <Name>LLParserGenLib</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>

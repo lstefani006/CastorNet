@@ -7,22 +7,6 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 public static partial class U
 {
-	/*
-	public class Tuple<A, B>
-	{
-		public A Item1;
-		public B Item2;
-
-		public static Tuple<A, B> Create(A a, B b)
-		{
-			var r = new Tuple<A, B> ();
-			r.Item1 = a;
-			r.Item2 = b;
-			return r;
-		}
-	}
-	*/
-
 	public static T DeepCopy<T>(this T src)
 	{
 		if (!typeof(T).IsSerializable)

@@ -1,5 +1,5 @@
 using System;
-using ULib.LLParserLexerLib;
+using LLParserLexerLib;
 
 namespace LLTest
 {
@@ -65,8 +65,8 @@ namespace LLTest
 	}
 	public class ExprNum : ExprRoot
 	{
-		public ExprNum(ULib.LLParserLexerLib.TokenAST a) { this.a = a; }
-		ULib.LLParserLexerLib.TokenAST a;
+		public ExprNum(LLParserLexerLib.TokenAST a) { this.a = a; }
+		LLParserLexerLib.TokenAST a;
 		public override int Exec() { return int.Parse(a.v); }
 	}
 

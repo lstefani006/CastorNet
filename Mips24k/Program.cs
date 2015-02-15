@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using ULib.LLParserLexerLib;
+using LLParserLexerLib;
 
 
 namespace Mips24k

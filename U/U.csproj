@@ -40,8 +40,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="U_CommandProcessor.cs" />
-    <Compile Include="U_Lexer.cs" />
-    <Compile Include="U_LLParserLexerLib.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="U.cs" />
     <Compile Include="U_CsStreamWriter.cs" />
