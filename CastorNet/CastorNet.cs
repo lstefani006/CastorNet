@@ -1,4 +1,4 @@
-﻿using CastorNet.Details;
+using CastorNet.Details;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -811,6 +811,7 @@ namespace CastorNetTest
 				& v > 10
 				& v < 20;
 
+			list.Value = new ComparableList<int>();
 			list.Value.Add(1);
 			list.Value.Add(10);
 			list.Value.Add(11);
